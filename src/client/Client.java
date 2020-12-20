@@ -1,8 +1,10 @@
 package client;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.Scanner;
 
 import packet.Packet;
 
@@ -13,6 +15,8 @@ public class Client implements Runnable {
 	DataInputStream in;
 	DataOutputStream out;
 	Thread listener;
+	LoginGUI loginGUI = null;
+	RoomListGUI roomGUI = null;
 	int myID = -1;
 	private boolean connected = true;
 
@@ -20,7 +24,8 @@ public class Client implements Runnable {
 		return connected;
 	}
 
-	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o) {
+	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI) {
+		this.loginGUI = loginGUI;
 		userName = u;
 		passWord = p;
 		sock = s;
@@ -88,6 +93,10 @@ public class Client implements Runnable {
 			out.close();
 			sock.close();
 			connected = false;
+//			if(roomGUI!=null) {
+//				roomGUI.networkFail();
+//			}
+			loginGUI.loginFail();
 		} catch (IOException e) {
 
 		}
@@ -101,6 +110,7 @@ public class Client implements Runnable {
 
 		myID = in.readInt();
 		System.out.println(myID);
+		loginGUI.loginSuccess();
 	}
 
 	void hdMessage() throws IOException {
@@ -113,32 +123,7 @@ public class Client implements Runnable {
 		if(message.equals("ngu")) {
 			output(Packet.CPQuit());
 			disconnect();
-		}
-	}
-
-	public static void main(String arg[]) {
-		Scanner sc = new Scanner(System.in);
-		String inputUserName;
-		String inputPassWord;
-		System.out.println("UserName: ");
-		inputUserName = sc.nextLine();
-		System.out.println("PassWord: ");
-		inputPassWord = sc.nextLine();
-		try {
-
-			Socket s = new Socket("localhost", 5656);
-			DataInputStream i = new DataInputStream(s.getInputStream());
-			DataOutputStream o = new DataOutputStream(s.getOutputStream());
-			String input;
-			Client main = new Client(inputUserName, inputPassWord, s, i, o);
-			while (true) {
-
-				System.out.println("Input");
-				input = sc.nextLine();
-				main.sendMessage(input);
-
-			}
-		} catch (IOException e) {
+			loginGUI.loginFail();
 		}
 	}
 
