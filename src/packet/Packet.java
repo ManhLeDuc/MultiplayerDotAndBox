@@ -88,4 +88,36 @@ public class Packet extends DataOutputStream {
 			return null;
 		} // shouldn't happen
 	}
+	
+	public static byte[] SPMessage(String message) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_MESSAGE); // write tag first
+			p.writeUTF(message);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPMessage(String message) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_MESSAGE); // write tag first
+			p.writeUTF(message);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPQuit() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_QUIT); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
 }
