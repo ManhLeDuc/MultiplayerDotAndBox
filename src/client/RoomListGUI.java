@@ -10,7 +10,7 @@ public class RoomListGUI extends JFrame{
 	JButton inputPassword;
 	JButton buttonSubmit;
 	Client currentClient = null;
-	LoginGUI currentLoginGUI = null;
+//	LoginGUI currentLoginGUI = null;
 	
 	public RoomListGUI(Client currentClient) {
 		this.currentClient = currentClient;

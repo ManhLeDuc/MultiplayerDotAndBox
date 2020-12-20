@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
 import packet.Packet;
 
@@ -15,7 +14,8 @@ public class Client implements Runnable {
 	DataInputStream in;
 	DataOutputStream out;
 	Thread listener;
-	LoginGUI loginGUI = null;
+//	LoginGUI loginGUI = null;
+	TestGUI loginGUI = null;
 	RoomListGUI roomGUI = null;
 	int myID = -1;
 	private boolean connected = true;
@@ -24,7 +24,19 @@ public class Client implements Runnable {
 		return connected;
 	}
 
-	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI) {
+//	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI) {
+//		this.loginGUI = loginGUI;
+//		userName = u;
+//		passWord = p;
+//		sock = s;
+//		in = i;
+//		out = o;
+//		(listener = new Thread(this)).start();
+//		output(Packet.CPLogin(userName, passWord));
+//
+//	}
+	
+	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, TestGUI loginGUI) {
 		this.loginGUI = loginGUI;
 		userName = u;
 		passWord = p;
