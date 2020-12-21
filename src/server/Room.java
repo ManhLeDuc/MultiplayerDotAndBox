@@ -39,7 +39,6 @@ public class Room {
 					him.room = this;
 					him.seat = i;
 					Player.outputAll(Packet.SPRoomPlayer(id, i, him.id));
-					update(him);
 					break join;
 				}
 			}

@@ -16,6 +16,9 @@ public class RoomInfo extends JPanel {
 	private int playerNum;
 	private JLabel lblPlayerNumber;
 	private RoomListGUI currentRoomListGUI;
+	
+	private int player1Id;
+	private int plyaer2Id;
 	/**
 	 * Create the panel.
 	 */
