@@ -1,6 +1,8 @@
 package packet;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 public class Packet extends DataOutputStream {
 	ByteArrayOutputStream b_out; // holds binary data
@@ -20,24 +22,27 @@ public class Packet extends DataOutputStream {
 	}
 
 	// Server packets tag
-	public static final byte SP_SOME_PACKET = 0;
+	public static final byte SP_ERROR_PACKET = 0;
 	public static final byte SP_YOU_ARE = 1;
 	public static final byte SP_LOGIN = 2;
 	public static final byte SP_LEAVE = 3;
 	public static final byte SP_MESSAGE = 4;
+	public static final byte SP_ROOM_OPT = 5;
+	public static final byte SP_ROOM_PLAYER = 6;
 
 	// Client packets tag
 	public static final byte CP_LOGIN = 100;
 	public static final byte CP_QUIT = 99;
 	public static final byte CP_MESSAGE = 98;
+	public static final byte CP_ROOM_OPT = 97;
+	public static final byte CP_ROOM_LEAVE = 96;
+	public static final byte CP_ROOM_JOIN = 95;
 
-	public static byte[] SPSomePacket(byte b, int i, String s) {
+	public static byte[] SPErrorPacket(String message) {
 		try {
 			Packet p = New(10); // estimated size
-			p.writeByte(SP_SOME_PACKET); // write tag first
-			p.writeByte(b); // write fields
-			p.writeInt(i);
-			p.writeUTF(s);
+			p.writeByte(SP_ERROR_PACKET); // write tag first
+			p.writeUTF(message);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
@@ -78,11 +83,11 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
-	public static byte[] SPLogin(String result) {
+	public static byte[] SPLogin(int playerId) {
 		try {
-			Packet p = New(10); // estimated size
+			Packet p = New(20); // estimated size
 			p.writeByte(SP_LOGIN); // write tag first
-			p.writeUTF(result);
+			p.writeInt(playerId);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
@@ -91,7 +96,7 @@ public class Packet extends DataOutputStream {
 	
 	public static byte[] SPMessage(String message) {
 		try {
-			Packet p = New(10); // estimated size
+			Packet p = New(20); // estimated size
 			p.writeByte(SP_MESSAGE); // write tag first
 			p.writeUTF(message);
 			return p.buf(); // return the buffer
@@ -115,6 +120,61 @@ public class Packet extends DataOutputStream {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(CP_QUIT); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] SPRoomPlayer(int roomId, int seat, int playerId) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_ROOM_PLAYER); // write tag first
+			p.writeInt(roomId);
+			p.writeInt(seat);
+			p.writeInt(playerId);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] SPRoomOpt(int roomId) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_ROOM_OPT); // write tag first
+			p.writeInt(roomId);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPRoomOpt() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_ROOM_OPT); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPRoomJoin(int roomId) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_ROOM_JOIN); // write tag first
+			p.writeInt(roomId);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPRoomLeave() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_ROOM_LEAVE); // write tag first
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;

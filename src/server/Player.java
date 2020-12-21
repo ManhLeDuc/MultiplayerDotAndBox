@@ -18,7 +18,7 @@ class Player extends Thread {
 	private DataOutputStream out;
 	public boolean connected = true;
 	private PlayerOutput out_thread = null;
-//	public Room table = null;
+	public Room room = null;
 	public int seat = -1;
 
 	public Player(Socket s, DataInputStream in, DataOutputStream out, HashMap<String, String> a)
@@ -53,7 +53,7 @@ class Player extends Thread {
 			for (int i = 0; i < global.length; i++) {
 				Player him = global[i];
 				// only send to players who have logged in
-				if (him != null && him.name != null)
+				if (him != null)
 					him.output(p);
 			}
 		}
@@ -63,8 +63,8 @@ class Player extends Thread {
 		if (id == -1)
 			return; // we do it only once
 		connected = false;
-//		if (table != null) // leave the table
-//			table.leave(this);
+		if (room != null) // leave the table
+			room.leave(this);
 		synchronized (global) { // critical section
 			global[id] = null; // will GC eventually
 		}
@@ -96,6 +96,15 @@ class Player extends Thread {
 						break;
 					case Packet.CP_MESSAGE:
 						hdMessage();
+						break;
+					case Packet.CP_ROOM_OPT:
+						hdRoomOpt();
+						break;
+					case Packet.CP_ROOM_LEAVE:
+						hdRoomLeave();
+						break;
+					case Packet.CP_ROOM_JOIN:
+						hdRoomJoin();
 						break;
 					// call other packet handlers
 					}
@@ -134,10 +143,46 @@ class Player extends Thread {
 		System.out.println(username);
 		System.out.println(password);
 		if (password.equals(accounts.get(username))) {
-			output(Packet.SPYouAre(id));
-			System.out.println("Send id " + id);
+			output(Packet.SPLogin(id));
+			synchronized (Room.global) {
+				for (int i = 0; i < Room.global.length; i++) {
+					if (Room.global[i] != null) {
+						Room.global[i].update(this);
+					}
+				}
+			}
 		} else {
-			output(Packet.SPLogin("ngu"));
+			output(Packet.SPLogin(-1));
+		}
+	}
+
+	void hdRoomOpt() throws IOException {
+		if (this.room == null) {
+			try {
+				this.room = new Room();
+				this.room.join(this);
+				System.out.println("Created Room");
+			} catch (Exception e) {
+
+			}
+		}
+
+	}
+	
+	void hdRoomLeave() throws IOException {
+		if(this.room != null) {
+			this.room.leave(this);
+		}
+	}
+	
+	void hdRoomJoin() throws IOException {
+		int roomId = in.readInt();
+		if (this.room == null) {
+			try {
+				Room.global[roomId].join(this);
+			} catch (Exception e) {
+
+			}
 		}
 	}
 }

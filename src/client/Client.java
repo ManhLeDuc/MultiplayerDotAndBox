@@ -15,8 +15,8 @@ public class Client implements Runnable {
 	DataOutputStream out;
 	Thread listener;
 //	LoginGUI loginGUI = null;
-	TestGUI loginGUI = null;
-	RoomListGUI roomGUI = null;
+	LoginGUI loginGUI = null;
+	RoomListGUI roomListGUI = null;
 	int myID = -1;
 	private boolean connected = true;
 
@@ -24,20 +24,9 @@ public class Client implements Runnable {
 		return connected;
 	}
 
-//	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI) {
-//		this.loginGUI = loginGUI;
-//		userName = u;
-//		passWord = p;
-//		sock = s;
-//		in = i;
-//		out = o;
-//		(listener = new Thread(this)).start();
-//		output(Packet.CPLogin(userName, passWord));
-//
-//	}
-	
-	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, TestGUI loginGUI) {
+	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI, RoomListGUI roomListGUI) {
 		this.loginGUI = loginGUI;
+		this.roomListGUI = roomListGUI;
 		userName = u;
 		passWord = p;
 		sock = s;
@@ -78,10 +67,15 @@ public class Client implements Runnable {
 					case Packet.SP_LOGIN:
 						hdLogin();
 						break;
-//							case Packet.CP_MESSAGE:
-//								hdMessage();
-//								break;
-					// call other packet handlers
+					case Packet.SP_ROOM_OPT:
+						hdRoomOpt();
+						break;
+					case Packet.SP_ROOM_PLAYER:
+						hdRoomPlayer();
+						break;
+					case Packet.SP_ERROR_PACKET:
+						hdErrorPacket();
+						break;
 					}
 				}
 
@@ -105,9 +99,9 @@ public class Client implements Runnable {
 			out.close();
 			sock.close();
 			connected = false;
-//			if(roomGUI!=null) {
-//				roomGUI.networkFail();
-//			}
+			if(loginGUI!=null) {
+				loginGUI.networkFail();
+			}
 			loginGUI.loginFail();
 		} catch (IOException e) {
 
@@ -122,21 +116,42 @@ public class Client implements Runnable {
 
 		myID = in.readInt();
 		System.out.println(myID);
-		loginGUI.loginSuccess();
+		loginGUI.loginSuccess(myID);
 	}
 
 	void hdMessage() throws IOException {
 		String message = in.readUTF();
 		System.out.println(message);
 	}
-	
+
 	void hdLogin() throws IOException {
-		String message = in.readUTF();
-		if(message.equals("ngu")) {
+		int tempId = in.readInt();
+		if (tempId == -1) {
 			output(Packet.CPQuit());
 			disconnect();
 			loginGUI.loginFail();
+		} else {
+			myID = tempId;
+			System.out.println(myID);
+			loginGUI.loginSuccess(myID);
 		}
+	}
+	
+	void hdRoomOpt() throws IOException {
+		
+		
+	}
+	
+	void hdRoomPlayer() throws IOException {
+		System.out.println("Start hdRoomPlayer");
+		int roomId = in.readInt();
+		int seat = in.readInt();
+		int playerId = in.readInt();
+		roomListGUI.roomPlayer(roomId, seat, playerId);
+	}
+	
+	void hdErrorPacket() throws IOException {
+		
 	}
 
 }

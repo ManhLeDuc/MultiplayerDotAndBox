@@ -18,8 +18,10 @@ public class Room {
 				}
 			}
 		}
-		if (id == -1)
+		if (id == -1) {
 			throw new FullServerException();
+		}
+			
 	}
 
 	public synchronized void outputTable(byte[] p) {
@@ -29,56 +31,49 @@ public class Room {
 		}
 	}
 
-//	public synchronized void join(Player him) {
-//		join: {
-//			// seats 0 - 3 are for players, the rest spectators
-//			for (int i = 0; i < players.length; i++) {
-//				if (players[i] == null) {
-//					players[i] = him;
-//					him.table = this;
-//					him.seat = i;
-//					Player.outputAll(Packet.SPTablePlayer(id, i, him.id));
-//					break join;
-//				}
-//			}
-//			him.output(Packet.SPMessage(Packet.MSG_GOD, 0, "Table is full."));
-//			return;
-//		}
-//		// MahJong-related stuff here
-//	}
+	public synchronized void join(Player him) {
+		join: {
+			for (int i = 0; i < players.length; i++) {
+				if (players[i] == null) {
+					players[i] = him;
+					him.room = this;
+					him.seat = i;
+					Player.outputAll(Packet.SPRoomPlayer(id, i, him.id));
+					update(him);
+					break join;
+				}
+			}
+			him.output(Packet.SPErrorPacket("Table is full."));
+			return;
+		}
+		// MahJong-related stuff here
+	}
 
-//	public void leave(Player him) {
-//		synchronized (global) { // critical section
-//			synchronized (this) {
-//				if (him.table != this)
-//					return;
-//				// announce to all; player id of -1 means leaving table
-//				Player.outputAll(Packet.SPTablePlayer(id, him.seat, -1));
-//				players[him.seat] = null;
-//				him.table = null;
-//				him.seat = -1;
-//				for (int i = 0; i < 4; i++)
-//					if (players[i] != null)
-//						return;
-//				// now the table has only spectators, so we close it
-//				for (int i = 4; i < players.length; i++) {
-//					if (players[i] != null) {
-//						Player.outputAll(Packets.SPTablePlayer(id, i, -1));
-//						players[i].table = null;
-//						players[i].seat = -1;
-//						players[i] = null;
-//					}
-//				}
-//				global[id] = null;
-//			}
-//		}
-//	}
+	public void leave(Player him) {
+		synchronized (global) { // critical section
+			synchronized (this) {
+				System.out.println("Start Leave");
+				if (him.room != this)
+					return;
+				// announce to all; player id of -1 means leaving table
+				Player.outputAll(Packet.SPRoomPlayer(id, him.seat, -1));
+				players[him.seat] = null;
+				him.room = null;
+				him.seat = -1;
+				for (int i = 0; i < players.length; i++)
+					if (players[i] != null)
+						return;
+				// now the table has only spectators, so we close it
+				global[id] = null;
+			}
+		}
+	}
 
-//	public synchronized void update(Player him) {
-//		for (int i = 0; i < players.length; i++) {
-//			if (players[i] != null)
-//				him.output(Packet.SPTablePlayer(id, i, t.players[i].id));
-//		}
-//	}
+	public synchronized void update(Player him) {
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] != null)
+				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id));
+		}
+	}
 	// other methods...
 }
