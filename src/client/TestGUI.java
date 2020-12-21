@@ -209,8 +209,7 @@ public class TestGUI extends JFrame {
 				DataOutputStream o = new DataOutputStream(s.getOutputStream());
 				currentClient = new Client(txtUsername.getText(), txtPassword.getText(), s, i, o, currentLoginGUI);
 			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "Network Fail", "Error!!!", JOptionPane.ERROR_MESSAGE);
-				currentClient = null;
+				networkFail();
 			}
 		}
 	};
