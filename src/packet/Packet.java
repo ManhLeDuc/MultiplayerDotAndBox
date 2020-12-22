@@ -29,6 +29,7 @@ public class Packet extends DataOutputStream {
 	public static final byte SP_MESSAGE = 4;
 	public static final byte SP_ROOM_OPT = 5;
 	public static final byte SP_ROOM_PLAYER = 6;
+	public static final byte SP_ROOM_INFO = 7;
 
 	// Client packets tag
 	public static final byte CP_LOGIN = 100;
@@ -149,6 +150,7 @@ public class Packet extends DataOutputStream {
 			return null;
 		} // shouldn't happen
 	}
+	
 	
 	public static byte[] CPRoomOpt() {
 		try {

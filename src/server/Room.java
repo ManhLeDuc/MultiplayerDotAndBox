@@ -6,6 +6,11 @@ public class Room {
 	public static Room[] global = new Room[50];
 	int id = -1;
 	Player[] players = new Player[2];
+	
+
+	public Player[] getPlayers() {
+		return players;
+	}
 
 	public Room() throws FullServerException {
 		// assign a unique table id

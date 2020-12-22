@@ -1,7 +1,7 @@
 package client;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -40,6 +40,11 @@ public class RoomGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
+	
+	public RoomGUI() {
+		// TODO Auto-generated constructor stub
+	}
+	
 	public RoomGUI(LoginGUI currentLoginGUI, RoomListGUI currentRoomListGUI) {
 		this.currentLoginGUI = currentLoginGUI;
 		this.currentRoomListGUI = currentRoomListGUI;
@@ -63,7 +68,7 @@ public class RoomGUI extends JFrame {
 		lblPlayer2Id = new JLabel("No one is here");
 		panel_1.add(lblPlayer2Id);
 		
-		JButton btnStartGame = new JButton("Start Game");
+		btnStartGame = new JButton("Start Game");
 		contentPane.add(btnStartGame, BorderLayout.CENTER);
 		btnStartGame.addActionListener(outRoomListener);
 	}

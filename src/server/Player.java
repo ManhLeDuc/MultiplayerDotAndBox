@@ -180,6 +180,8 @@ class Player extends Thread {
 		if (this.room == null) {
 			try {
 				Room.global[roomId].join(this);
+				if(Room.global[roomId].getPlayers().length == 2)
+					Room.global[roomId].update(this);
 			} catch (Exception e) {
 
 			}

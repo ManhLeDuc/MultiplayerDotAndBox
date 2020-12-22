@@ -22,21 +22,23 @@ public class RoomInfo extends JPanel {
 	/**
 	 * Create the panel.
 	 */
+	
 	public RoomInfo(int roomId, RoomListGUI currentRoomListGUI) {
 		
 		super();
 		this.currentRoomListGUI = currentRoomListGUI;
 		setBorder(new LineBorder(new Color(0, 0, 0), 2));
-		setBackground(Color.LIGHT_GRAY);
+		setBackground(new Color(255, 182, 193));
 		this.roomId = roomId;
 		this.playerNum = 0;
 		setLayout(null);
 		
-		JLabel lblRoomId = new JLabel(String.valueOf(roomId));
+		JLabel lblRoomId = new JLabel("");
 		lblRoomId.setBounds(35, 10, 45, 13);
 		add(lblRoomId);
 		
 		JButton btnJoin = new JButton("Join");
+		btnJoin.setBackground(new Color(244, 164, 96));
 		btnJoin.addActionListener(joinRoomListener);
 		btnJoin.setBounds(122, 21, 85, 21);
 		add(btnJoin);

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import packet.Packet;
+import sun.reflect.generics.tree.Tree;
 
 public class Client implements Runnable {
 	String userName;
@@ -14,7 +15,7 @@ public class Client implements Runnable {
 	DataInputStream in;
 	DataOutputStream out;
 	Thread listener;
-//	LoginGUI loginGUI = null;
+	
 	LoginGUI loginGUI = null;
 	RoomListGUI roomListGUI = null;
 	int myID = -1;
@@ -99,10 +100,23 @@ public class Client implements Runnable {
 			out.close();
 			sock.close();
 			connected = false;
-			if(loginGUI!=null) {
+			if(roomListGUI !=null) {
+				roomListGUI.setVisible(false);
+				loginGUI.setVisible(true);
 				loginGUI.networkFail();
 			}
-			loginGUI.loginFail();
+		} catch (IOException e) {
+
+		}
+	}
+	
+	void disconnectByUser(int id) {
+		try {
+			System.out.print("hello");
+			in.close();
+			out.close();
+			sock.close();
+			connected = false;
 		} catch (IOException e) {
 
 		}
@@ -128,7 +142,7 @@ public class Client implements Runnable {
 		int tempId = in.readInt();
 		if (tempId == -1) {
 			output(Packet.CPQuit());
-			disconnect();
+			disconnectByUser(1);
 			loginGUI.loginFail();
 		} else {
 			myID = tempId;

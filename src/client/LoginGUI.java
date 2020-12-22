@@ -40,7 +40,6 @@ public class LoginGUI extends JFrame {
 	private JTextField txtPassword;
 	private JLabel lblLoginMessage;
 	Client currentClient = null;
-	LoginGUI currentLoginGUI = null;
 	RoomListGUI currentRoomListGUI = null;
 	RoomGUI currentRoomGUI = null;
 
@@ -53,11 +52,12 @@ public class LoginGUI extends JFrame {
 	 * Create the frame.
 	 */
 	public LoginGUI() {
-		currentLoginGUI = this;
+		
 		currentRoomListGUI = new RoomListGUI(this, currentRoomGUI);
 		currentRoomGUI = new RoomGUI(this, currentRoomListGUI);
 		
 		this.currentRoomListGUI.setCurrentRoomGUI(currentRoomGUI);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1166, 599);
 		contentPane = new JPanel();
@@ -212,7 +212,7 @@ public class LoginGUI extends JFrame {
 				Socket s = new Socket("localhost", 5656);
 				DataInputStream i = new DataInputStream(s.getInputStream());
 				DataOutputStream o = new DataOutputStream(s.getOutputStream());
-				currentClient = new Client(txtUsername.getText(), txtPassword.getText(), s, i, o, currentLoginGUI, currentRoomListGUI);
+				currentClient = new Client(txtUsername.getText(), txtPassword.getText(), s, i, o, LoginGUI.this, currentRoomListGUI);
 			} catch (IOException e) {
 				networkFail();
 			}
