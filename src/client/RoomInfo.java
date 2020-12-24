@@ -1,15 +1,14 @@
 package client;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.border.LineBorder;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import packet.Packet;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.LineBorder;
 
 public class RoomInfo extends JPanel {
 	private int roomId;
@@ -17,8 +16,18 @@ public class RoomInfo extends JPanel {
 	private JLabel lblPlayerNumber;
 	private RoomListGUI currentRoomListGUI;
 	
-	private int player1Id;
-	private int plyaer2Id;
+	private int player1Id = -1;
+	private int player2Id = -1;
+	
+	public int getPlayer2Id() {
+		return player2Id;
+	}
+
+	public int getPlayer1Id() {
+		return player1Id;
+	}
+
+	
 	/**
 	 * Create the panel.
 	 */
@@ -55,9 +64,15 @@ public class RoomInfo extends JPanel {
 
 	}
 	
-	public void addPlayer() {
+	public void addPlayer(int seat, int playerId) {
 		if(this.playerNum == 0) {
 			this.setVisible(true);
+		}
+		if(seat == 0) {
+			this.player1Id = playerId;
+		}
+		else if(seat == 1) {
+			this.player2Id = playerId;
 		}
 		if(this.playerNum<2) {
 			this.playerNum = this.playerNum + 1;
@@ -65,10 +80,17 @@ public class RoomInfo extends JPanel {
 		}
 	}
 	
-	public void removePlayer() {
+	public void removePlayer(int seat) {
 		if(this.playerNum>0) {
+			if(seat == 0) {
+				this.player1Id = -1;
+			}
+			else if(seat == 1) {
+				this.player2Id = -1;
+			}
 			this.playerNum -= 1;
 			lblPlayerNumber.setText((String.valueOf(playerNum)+"/2"));
+			
 			if(this.playerNum==0) {
 				this.setVisible(false);
 			}
@@ -78,7 +100,7 @@ public class RoomInfo extends JPanel {
 	private ActionListener joinRoomListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			currentRoomListGUI.currentClient.output(Packet.CPRoomJoin(roomId));
+			currentRoomListGUI.joinRoom(roomId);
 		}
 	};
 

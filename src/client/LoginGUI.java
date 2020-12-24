@@ -1,33 +1,24 @@
 package client;
 
 import java.awt.BorderLayout;
-
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.border.LineBorder;
-
-
-
 import java.awt.Color;
-import javax.swing.JTextField;
 import java.awt.Font;
-import javax.swing.SwingConstants;
-import javax.swing.ImageIcon;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 public class LoginGUI extends JFrame {
 
@@ -39,10 +30,7 @@ public class LoginGUI extends JFrame {
 	private JTextField txtUsername;
 	private JTextField txtPassword;
 	private JLabel lblLoginMessage;
-	Client currentClient = null;
-	RoomListGUI currentRoomListGUI = null;
-	RoomGUI currentRoomGUI = null;
-
+	private Controller controller;
 	/**
 	 * Launch the application.
 	 */
@@ -51,13 +39,10 @@ public class LoginGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public LoginGUI() {
+	public LoginGUI(Controller controller) {
 		
-		currentRoomListGUI = new RoomListGUI(this, currentRoomGUI);
-		currentRoomGUI = new RoomGUI(this, currentRoomListGUI);
-		
-		this.currentRoomListGUI.setCurrentRoomGUI(currentRoomGUI);
-		
+		this.controller = controller;
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1166, 599);
 		contentPane = new JPanel();
@@ -139,10 +124,7 @@ public class LoginGUI extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
 				if (JOptionPane.showConfirmDialog(null, "Are you sure close this app ?", "Confirmation", JOptionPane.YES_NO_OPTION) == 0) {
-					if (currentClient != null) {
-						currentClient.disconnect();
-					}
-					LoginGUI.this.dispose();
+					controller.close();
 				}
 			}
 			@Override
@@ -206,50 +188,13 @@ public class LoginGUI extends JFrame {
 	
 	private ActionListener submitListener = new ActionListener() {
 		@Override
-		public void actionPerformed(ActionEvent actionEvent) {
-			try {
-
-				Socket s = new Socket("localhost", 5656);
-				DataInputStream i = new DataInputStream(s.getInputStream());
-				DataOutputStream o = new DataOutputStream(s.getOutputStream());
-				currentClient = new Client(txtUsername.getText(), txtPassword.getText(), s, i, o, LoginGUI.this, currentRoomListGUI);
-			} catch (IOException e) {
-				networkFail();
-			}
+		public void actionPerformed(ActionEvent actionEvent)  {
+			controller.loginController(txtUsername.getText(), txtPassword.getText());
 		}
 	};
 	
 	public void loginFail() {
 		lblLoginMessage.setText("Login Fail!!");
-		currentClient = null;
-		this.setVisible(true);
-	}
+	};
 	
-	public void networkFail() {
-		JOptionPane.showMessageDialog(null, "Network Fail", "Error!!!", JOptionPane.ERROR_MESSAGE);
-		currentClient = null;
-		this.setVisible(true);
-	}
-	
-	public void loginSuccess(int id) {
-		this.setVisible(false);
-		this.currentRoomListGUI.setVisible(true);
-		this.currentRoomListGUI.setUserName(String.valueOf(id));
-		this.currentRoomListGUI.setClient(currentClient);
-		this.currentRoomGUI.setClient(currentClient);
-	}
-	
-	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					TestGUI frame = new TestGUI();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-		new LoginGUI();
-	}
 }

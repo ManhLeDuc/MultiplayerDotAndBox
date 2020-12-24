@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.net.Socket;
 
 import packet.Packet;
-import sun.reflect.generics.tree.Tree;
 
 public class Client implements Runnable {
 	String userName;
@@ -16,8 +15,7 @@ public class Client implements Runnable {
 	DataOutputStream out;
 	Thread listener;
 	
-	LoginGUI loginGUI = null;
-	RoomListGUI roomListGUI = null;
+	Controller controller;
 	int myID = -1;
 	private boolean connected = true;
 
@@ -25,9 +23,8 @@ public class Client implements Runnable {
 		return connected;
 	}
 
-	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, LoginGUI loginGUI, RoomListGUI roomListGUI) {
-		this.loginGUI = loginGUI;
-		this.roomListGUI = roomListGUI;
+	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, Controller controller) {
+		this.controller = controller;
 		userName = u;
 		passWord = p;
 		sock = s;
@@ -35,7 +32,6 @@ public class Client implements Runnable {
 		out = o;
 		(listener = new Thread(this)).start();
 		output(Packet.CPLogin(userName, passWord));
-
 	}
 
 	void output(byte[] p) {
@@ -68,9 +64,6 @@ public class Client implements Runnable {
 					case Packet.SP_LOGIN:
 						hdLogin();
 						break;
-					case Packet.SP_ROOM_OPT:
-						hdRoomOpt();
-						break;
 					case Packet.SP_ROOM_PLAYER:
 						hdRoomPlayer();
 						break;
@@ -100,23 +93,7 @@ public class Client implements Runnable {
 			out.close();
 			sock.close();
 			connected = false;
-			if(roomListGUI !=null) {
-				roomListGUI.setVisible(false);
-				loginGUI.setVisible(true);
-				loginGUI.networkFail();
-			}
-		} catch (IOException e) {
-
-		}
-	}
-	
-	void disconnectByUser(int id) {
-		try {
-			System.out.print("hello");
-			in.close();
-			out.close();
-			sock.close();
-			connected = false;
+			controller.disconnect();
 		} catch (IOException e) {
 
 		}
@@ -130,7 +107,7 @@ public class Client implements Runnable {
 
 		myID = in.readInt();
 		System.out.println(myID);
-		loginGUI.loginSuccess(myID);
+		controller.loginSuccess(myID);
 	}
 
 	void hdMessage() throws IOException {
@@ -142,18 +119,13 @@ public class Client implements Runnable {
 		int tempId = in.readInt();
 		if (tempId == -1) {
 			output(Packet.CPQuit());
-			disconnectByUser(1);
-			loginGUI.loginFail();
+			disconnect();
+			controller.loginFail();
 		} else {
 			myID = tempId;
 			System.out.println(myID);
-			loginGUI.loginSuccess(myID);
+			controller.loginSuccess(myID);
 		}
-	}
-	
-	void hdRoomOpt() throws IOException {
-		
-		
 	}
 	
 	void hdRoomPlayer() throws IOException {
@@ -161,7 +133,7 @@ public class Client implements Runnable {
 		int roomId = in.readInt();
 		int seat = in.readInt();
 		int playerId = in.readInt();
-		roomListGUI.roomPlayer(roomId, seat, playerId);
+		controller.roomPlayer(roomId, seat, playerId);
 	}
 	
 	void hdErrorPacket() throws IOException {

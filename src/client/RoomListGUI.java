@@ -1,7 +1,9 @@
 package client;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.io.DataInputStream;
@@ -17,10 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import packet.Packet;
-import java.awt.Color;
-import java.awt.Font;
-
 public class RoomListGUI extends JFrame {
 
 	/**
@@ -31,31 +29,20 @@ public class RoomListGUI extends JFrame {
 	private JButton btnLogOut;
 	private JButton btnCreateRoom;
 	private JLabel lblUserId;
+	private Controller controller;
 	
-	Client currentClient = null;
-	LoginGUI currentLoginGUI = null;
-	RoomGUI currentRoomGUI = null;
 	
-	public RoomGUI getCurrentRoomGUI() {
-		return currentRoomGUI;
-	}
-	public void setCurrentRoomGUI(RoomGUI currentRoomGUI) {
-		this.currentRoomGUI = currentRoomGUI;
-	}
 
 	private RoomInfo[] roomInfoList = new RoomInfo[50];
 	
-	public void setClient(Client client) {
-		this.currentClient = client;
-	}
+	
 	/**
 	 * Create the frame.
 	 */
 	
-	public RoomListGUI(LoginGUI currentLoginGUI, RoomGUI currentRoomGUI) {
+	public RoomListGUI(Controller controller) {
 		setResizable(false);
-		this.currentLoginGUI = currentLoginGUI;
-		this.currentRoomGUI = currentRoomGUI;
+		this.controller = controller;
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 919, 679);
@@ -125,46 +112,53 @@ public class RoomListGUI extends JFrame {
 	
 	public void roomPlayer(int roomId, int seat, int playerId) {
 		System.out.println("Room Player Function");
-		if(this.currentRoomGUI.getId()==roomId) {
-			this.currentRoomGUI.enterRoom(seat, playerId);
-		}
+//		if(this.currentRoomGUI.getId()==roomId) {
+//			this.currentRoomGUI.enterRoom(seat, playerId);
+//		}
 		if(playerId!=-1) {
-			roomInfoList[roomId].addPlayer();
+			roomInfoList[roomId].addPlayer(seat, playerId);
 		}
 		else {
-			roomInfoList[roomId].removePlayer();
+			roomInfoList[roomId].removePlayer(seat);
 		}
-		if(playerId == this.currentClient.myID && this.currentRoomGUI.getId()==-1) {
-			
-			enterRoom(seat, roomId);
-		}
-		if(this.currentRoomGUI.getId()==roomId) {
-			this.currentRoomGUI.enterRoom(seat, playerId);
-		}
+//		if(playerId == this.currentClient.myID && this.currentRoomGUI.getId()==-1) {
+//			
+//			enterRoom(seat, roomId);
+//		}
+//		if(this.currentRoomGUI.getId()==roomId) {
+//			this.currentRoomGUI.enterRoom(seat, playerId);
+//		}
 	}
 	
 	private ActionListener createRoomListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			System.out.println("Pressed");
-			currentClient.output(Packet.CPRoomOpt());
+			System.out.println("Pressed create room");
+			controller.createRoom();
 		}
 	};
+	
+	
+	public int getPlayerIdFromRoom(int roomId, int seat) {
+		if(seat == 0) {
+			return roomInfoList[roomId].getPlayer1Id();
+		}
+		else if(seat == 1) {
+			return roomInfoList[roomId].getPlayer2Id();
+		}
+		else return -1;	
+	}
+	
+	public void joinRoom(int roomId) {
+		controller.joinRoom(roomId);
+	}
 	
 	private ActionListener logout = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			currentClient.output(Packet.CPQuit());
-			currentClient.disconnectByUser(currentClient.myID);
-			currentClient.roomListGUI.setVisible(false);			
-			currentLoginGUI.setVisible(true);
+			controller.disconnect();
 		}
 	};
 	
-	public void enterRoom(int seat, int roomId) {
-		this.currentRoomGUI.setId(roomId);	
-		this.currentRoomGUI.enterRoom(seat, this.currentClient.myID);
-		this.currentRoomGUI.setVisible(true);
-		this.setVisible(false);
-	}
+
 }
