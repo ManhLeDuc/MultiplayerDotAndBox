@@ -31,9 +31,6 @@ public class RoomGUI extends JFrame {
 	 * Create the frame.
 	 */
 	
-	public RoomGUI() {
-		// TODO Auto-generated constructor stub
-	}
 	
 	public RoomGUI(Controller controller) {
 		this.controller = controller;
@@ -42,23 +39,26 @@ public class RoomGUI extends JFrame {
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		contentPane.setLayout(null);
 		
 		JPanel panel = new JPanel();
-		contentPane.add(panel, BorderLayout.WEST);
+		panel.setBounds(5, 5, 113, 42);
+		contentPane.add(panel);
 		
 		lblPlayer1Id = new JLabel("No one is here");
 		panel.add(lblPlayer1Id);
 		
 		JPanel panel_1 = new JPanel();
-		contentPane.add(panel_1, BorderLayout.EAST);
+		panel_1.setBounds(310, 5, 113, 42);
+		contentPane.add(panel_1);
 		
 		lblPlayer2Id = new JLabel("No one is here");
 		panel_1.add(lblPlayer2Id);
 		
 		btnStartGame = new JButton("Start Game");
-		contentPane.add(btnStartGame, BorderLayout.CENTER);
+		btnStartGame.setBounds(118, 210, 192, 29);
+		contentPane.add(btnStartGame);
 		btnStartGame.addActionListener(outRoomListener);
 	}
 	
