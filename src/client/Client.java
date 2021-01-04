@@ -53,7 +53,7 @@ public class Client implements Runnable {
 				byte tag = in.readByte();
 				synchronized (working) {
 					switch (tag) {
-					case Packet.SP_LEAVE:
+					case Packet.SP_QUIT:
 						break loop;
 					case Packet.SP_YOU_ARE:
 						hdYouAre();
@@ -70,7 +70,11 @@ public class Client implements Runnable {
 					case Packet.SP_ERROR_PACKET:
 						hdErrorPacket();
 						break;
+					case Packet.SP_LEAVE:
+						hdLeave();
+						break;
 					}
+					
 				}
 
 			} catch (IOException e) {
@@ -108,6 +112,10 @@ public class Client implements Runnable {
 		myID = in.readInt();
 		System.out.println(myID);
 		controller.loginSuccess(myID);
+	}
+	
+	void hdLeave() throws IOException {
+		in.readInt();
 	}
 
 	void hdMessage() throws IOException {

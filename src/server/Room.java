@@ -56,7 +56,6 @@ public class Room {
 	public void leave(Player him) {
 		synchronized (global) { // critical section
 			synchronized (this) {
-				System.out.println("Start Leave");
 				if (him.room != this)
 					return;
 				// announce to all; player id of -1 means leaving table

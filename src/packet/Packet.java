@@ -30,6 +30,7 @@ public class Packet extends DataOutputStream {
 	public static final byte SP_ROOM_OPT = 5;
 	public static final byte SP_ROOM_PLAYER = 6;
 	public static final byte SP_ROOM_INFO = 7;
+	public static final byte SP_QUIT = 8;
 
 	// Client packets tag
 	public static final byte CP_LOGIN = 100;

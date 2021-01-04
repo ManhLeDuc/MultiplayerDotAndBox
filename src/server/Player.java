@@ -60,9 +60,7 @@ class Player extends Thread {
 		connected = false;
 		if (room != null) // leave the table
 			room.leave(this);
-		if (account != null) {
-			Account.logout(account.getUserName());
-		}
+
 		synchronized (global) { // critical section
 			global[id] = null; // will GC eventually
 		}
@@ -72,7 +70,10 @@ class Player extends Thread {
 			sock.close();
 		} catch (IOException e) {
 		}
-		outputAll(Packet.SPLeave(id));
+		if (account != null) {
+			Account.logout(account.getUserName());
+			outputAll(Packet.SPLeave(id));
+		}
 		id = -1; // we're done here
 	}
 
@@ -135,7 +136,7 @@ class Player extends Thread {
 		String username = in.readUTF();
 		String password = in.readUTF();
 		printPacket(Packet.CPLogin(username, password));
-		
+
 		if ((account = Account.login(username, password)) != null) {
 			output(Packet.SPLogin(id));
 			synchronized (Room.global) {
@@ -181,7 +182,7 @@ class Player extends Thread {
 			}
 		}
 	}
-	
+
 	private void printPacket(byte[] p) {
 		System.out.println("Recieved Packet:");
 		for (int i = 0; i < p.length; i++) {
