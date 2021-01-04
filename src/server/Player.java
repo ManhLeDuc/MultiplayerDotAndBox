@@ -4,15 +4,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.HashMap;
 
 import packet.Packet;
 
 class Player extends Thread {
-	public HashMap<String, String> accounts;
 	public static Player[] global = new Player[100];
 	public int id = -1;
-	public String name = null;
+	private Account account = null;
 	private Socket sock;
 	private DataInputStream in;
 	private DataOutputStream out;
@@ -21,9 +19,7 @@ class Player extends Thread {
 	public Room room = null;
 	public int seat = -1;
 
-	public Player(Socket s, DataInputStream in, DataOutputStream out, HashMap<String, String> a)
-			throws FullServerException {
-		accounts = a;
+	public Player(Socket s, DataInputStream in, DataOutputStream out) throws FullServerException {
 		synchronized (global) { // find a unique player id
 			for (int i = 0; i < global.length; i++) {
 				if (global[i] == null) {
@@ -40,7 +36,6 @@ class Player extends Thread {
 		this.out = out;
 		(out_thread = new PlayerOutput(this, out)).start();
 		System.out.println("New Client connected");
-//		output(Packet.SPYouAre(id)); // notify the player
 	}
 
 	public void output(byte[] p) {
@@ -65,6 +60,9 @@ class Player extends Thread {
 		connected = false;
 		if (room != null) // leave the table
 			room.leave(this);
+		if (account != null) {
+			Account.logout(account.getUserName());
+		}
 		synchronized (global) { // critical section
 			global[id] = null; // will GC eventually
 		}
@@ -74,8 +72,7 @@ class Player extends Thread {
 			sock.close();
 		} catch (IOException e) {
 		}
-		if (name != null) // announce leave
-			outputAll(Packet.SPLeave(id));
+		outputAll(Packet.SPLeave(id));
 		id = -1; // we're done here
 	}
 
@@ -128,21 +125,18 @@ class Player extends Thread {
 	}
 
 	void hdMessage() throws IOException {
-		// CP_MESSAGE contains a target type (MSG_SERVER,
-		// MSG_TABLE, or MSG_ALL), and a text message.
+
 		String text = in.readUTF();
-		System.out.println(text);
 		output(Packet.SPMessage(text));
 	}
 
 	void hdLogin() throws IOException {
-		// CP_MESSAGE contains a target type (MSG_SERVER,
-		// MSG_TABLE, or MSG_ALL), and a text message.
+
 		String username = in.readUTF();
 		String password = in.readUTF();
-		System.out.println(username);
-		System.out.println(password);
-		if (password.equals(accounts.get(username))) {
+		printPacket(Packet.CPLogin(username, password));
+		
+		if ((account = Account.login(username, password)) != null) {
 			output(Packet.SPLogin(id));
 			synchronized (Room.global) {
 				for (int i = 0; i < Room.global.length; i++) {
@@ -157,26 +151,28 @@ class Player extends Thread {
 	}
 
 	void hdRoomOpt() throws IOException {
+		printPacket(Packet.CPRoomOpt());
 		if (this.room == null) {
 			try {
 				this.room = new Room();
 				this.room.join(this);
-				System.out.println("Created Room");
 			} catch (Exception e) {
 
 			}
 		}
 
 	}
-	
+
 	void hdRoomLeave() throws IOException {
-		if(this.room != null) {
+		printPacket(Packet.CPRoomLeave());
+		if (this.room != null) {
 			this.room.leave(this);
 		}
 	}
-	
+
 	void hdRoomJoin() throws IOException {
 		int roomId = in.readInt();
+		printPacket(Packet.CPRoomJoin(roomId));
 		if (this.room == null) {
 			try {
 				Room.global[roomId].join(this);
@@ -184,5 +180,13 @@ class Player extends Thread {
 
 			}
 		}
+	}
+	
+	private void printPacket(byte[] p) {
+		System.out.println("Recieved Packet:");
+		for (int i = 0; i < p.length; i++) {
+			System.out.printf("%2x ", p[i]);
+		}
+		System.out.println();
 	}
 }

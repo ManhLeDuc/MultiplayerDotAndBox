@@ -11,6 +11,10 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 public class RoomInfo extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int roomId;
 	private int playerNum;
 	private JLabel lblPlayerNumber;
