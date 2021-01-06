@@ -29,8 +29,6 @@ public class RoomGUI extends JFrame {
 	private int mySeat = -1;
 	
 
-	
-
 	/**
 	 * Create the frame.
 	 */
@@ -72,6 +70,7 @@ public class RoomGUI extends JFrame {
 		
 		btnStartGame = new JButton("Start Game");
 		btnStartGame.setBounds(130, 320, 192, 29);
+		btnStartGame.addActionListener(startGameListener);
 		contentPane.add(btnStartGame);
 		
 		JPanel panel_2 = new JPanel();
@@ -98,13 +97,31 @@ public class RoomGUI extends JFrame {
 	private ActionListener quitRoomListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			controller.quitRoom();
+			controller.requestQuitRoom();
+		}
+	};
+	
+	private ActionListener startGameListener = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent actionEvent) {
+			int boardSize = 3;
+			for (int i = 0; i < 8; i++) {
+				if (sizeButton[i].isSelected()) {
+					boardSize = i + 3;
+				}
+			}
+			controller.requestStartGame(boardSize);
 		}
 	};
 	
 	public void update(int seat, int playerId) {
 		if(playerId == controller.getMyId()) {
 			mySeat = seat;
+			if(mySeat == 0) {
+				generateHostGUI();
+			}else {
+				generateClientGUI();
+			}
 		}
 		if(seat == 0) {
 			if(playerId == -1) {
@@ -127,6 +144,22 @@ public class RoomGUI extends JFrame {
 			controller.quitMyRoom();
 		}
 	
+	}
+	
+	private void generateHostGUI() {
+		btnStartGame.setVisible(true);
+		for(int i=0; i<sizeButton.length;i++) {
+			sizeButton[i].setVisible(true);
+		}
+	}
+	
+	private void generateClientGUI() {
+		btnStartGame.setVisible(false);
+		for(int i=0; i<sizeButton.length;i++) {
+			sizeButton[i].setVisible(false);
+		}
+		
+		
 	}
 
 }

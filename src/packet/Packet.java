@@ -31,6 +31,9 @@ public class Packet extends DataOutputStream {
 	public static final byte SP_ROOM_PLAYER = 6;
 	public static final byte SP_ROOM_INFO = 7;
 	public static final byte SP_QUIT = 8;
+	public static final byte SP_GAME_MOVE = 9;
+	public static final byte SP_GAME_START = 10;
+	public static final byte SP_GAME_WIN = 11;	
 
 	// Client packets tag
 	public static final byte CP_LOGIN = 100;
@@ -39,6 +42,9 @@ public class Packet extends DataOutputStream {
 	public static final byte CP_ROOM_OPT = 97;
 	public static final byte CP_ROOM_LEAVE = 96;
 	public static final byte CP_ROOM_JOIN = 95;
+	public static final byte CP_GAME_START = 94;
+	public static final byte CP_GAME_MOVE = 93;
+	public static final byte CP_GAME_SURRENDER = 92;
 
 	public static byte[] SPErrorPacket(String message) {
 		try {
@@ -152,6 +158,48 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
+	public static byte[] SPGameStart(int boardSize) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_GAME_START); // write tag first
+			p.writeInt(boardSize);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] SPGameWin(int seat) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_GAME_WIN); // write tag first
+			p.writeInt(seat);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPGameStart(int boardSize) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_GAME_START); // write tag first
+			p.writeInt(boardSize);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPGameSurrender() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_GAME_SURRENDER); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
 	
 	public static byte[] CPRoomOpt() {
 		try {

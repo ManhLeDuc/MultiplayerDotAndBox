@@ -15,7 +15,9 @@ public class Controller {
 	private LoginGUI loginGUI;
 	private RoomListGUI roomListGUI;
 	private RoomGUI roomGUI;
+	private GamePlay gamePlayGUI;
 	private int currentRoomId;
+	
 
 	public int getMyId() {
 		return currentClient.myID;
@@ -93,11 +95,11 @@ public class Controller {
 		currentRoomId = roomId;
 	}
 
-	public void joinRoom(int roomId) {
+	public void requestJoinRoom(int roomId) {
 		currentClient.output(Packet.CPRoomJoin(roomId));
 	}
 
-	public void quitRoom() {
+	public void requestQuitRoom() {
 		currentClient.output(Packet.CPRoomLeave());
 	}
 
@@ -105,6 +107,26 @@ public class Controller {
 		currentRoomId = -1;
 		roomGUI.setVisible(false);
 		roomListGUI.setVisible(true);
+	}
+	
+	public void requestStartGame(int boardSize) {
+		currentClient.output(Packet.CPGameStart(boardSize));
+	}
+	
+	public void startGame(int boardSize) {
+		roomGUI.setVisible(false);
+		this.gamePlayGUI = new GamePlay(boardSize, this);
+		
+	}
+	
+	public void gameEnd(int seat) {
+		this.gamePlayGUI.destroy();
+		this.gamePlayGUI = null;
+		roomGUI.setVisible(true);
+	}
+	
+	public void requestGameEnd() {
+		currentClient.output(Packet.CPGameSurrender());
 	}
 
 	public void close() {

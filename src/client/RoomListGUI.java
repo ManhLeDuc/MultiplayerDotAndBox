@@ -111,29 +111,17 @@ public class RoomListGUI extends JFrame {
 	}
 	
 	public void roomPlayer(int roomId, int seat, int playerId) {
-		System.out.println("Room Player Function");
-//		if(this.currentRoomGUI.getId()==roomId) {
-//			this.currentRoomGUI.enterRoom(seat, playerId);
-//		}
 		if(playerId!=-1) {
 			roomInfoList[roomId].addPlayer(seat, playerId);
 		}
 		else {
 			roomInfoList[roomId].removePlayer(seat);
 		}
-//		if(playerId == this.currentClient.myID && this.currentRoomGUI.getId()==-1) {
-//			
-//			enterRoom(seat, roomId);
-//		}
-//		if(this.currentRoomGUI.getId()==roomId) {
-//			this.currentRoomGUI.enterRoom(seat, playerId);
-//		}
 	}
 	
 	private ActionListener createRoomListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			System.out.println("Pressed create room");
 			controller.createRoom();
 		}
 	};
@@ -150,7 +138,7 @@ public class RoomListGUI extends JFrame {
 	}
 	
 	public void joinRoom(int roomId) {
-		controller.joinRoom(roomId);
+		controller.requestJoinRoom(roomId);
 	}
 	
 	private ActionListener logout = new ActionListener() {

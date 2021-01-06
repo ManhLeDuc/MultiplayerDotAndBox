@@ -104,6 +104,12 @@ class Player extends Thread {
 					case Packet.CP_ROOM_JOIN:
 						hdRoomJoin();
 						break;
+					case Packet.CP_GAME_START:
+						hdGameStart();
+						break;
+					case Packet.CP_GAME_SURRENDER:
+						hdGameSurrender();
+						break;
 					// call other packet handlers
 					}
 				}
@@ -182,10 +188,36 @@ class Player extends Thread {
 			}
 		}
 	}
+	
+	void hdGameStart() throws IOException {
+		int boardSize = in.readInt();
+		printPacket(Packet.CPGameStart(boardSize));
+		if (this.room != null && this.seat==0) {
+			try {
+				this.room.startGame(boardSize);
+			} catch (Exception e) {
+
+			}
+		}
+	}
+	
+	void hdGameSurrender() throws IOException {
+		printPacket(Packet.CPGameSurrender());
+		if (this.room != null && this.seat!=-1) {
+			
+			try {
+				this.room.endGame(this.seat);
+				System.out.println("Test");
+			} catch (Exception e) {
+
+			}
+		}
+	}
 
 	private void printPacket(byte[] p) {
 		System.out.println("Recieved Packet:");
-		for (int i = 0; i < p.length; i++) {
+		System.out.printf("%2d ", p[0]);
+		for (int i = 1; i < p.length; i++) {
 			System.out.printf("%2x ", p[i]);
 		}
 		System.out.println();

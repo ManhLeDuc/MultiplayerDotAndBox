@@ -73,6 +73,12 @@ public class Client implements Runnable {
 					case Packet.SP_LEAVE:
 						hdLeave();
 						break;
+					case Packet.SP_GAME_START:
+						hdGameStart();
+						break;
+					case Packet.SP_GAME_WIN:
+						hdGameWin();
+						break;
 					}
 					
 				}
@@ -137,15 +143,38 @@ public class Client implements Runnable {
 	}
 	
 	void hdRoomPlayer() throws IOException {
-		System.out.println("Start hdRoomPlayer");
 		int roomId = in.readInt();
 		int seat = in.readInt();
 		int playerId = in.readInt();
+		printPacket(Packet.SPRoomPlayer(roomId, seat, playerId));
 		controller.roomPlayer(roomId, seat, playerId);
 	}
 	
+	void hdGameStart() throws IOException {
+		int boardSize = in.readInt();
+		printPacket(Packet.SPGameStart(boardSize));
+		controller.startGame(boardSize);
+	}
+	
 	void hdErrorPacket() throws IOException {
+		in.readUTF();
+	}
+	
+	void hdGameWin() throws IOException {
+		System.out.println("Hello");
+		int seat = in.readInt();
+		printPacket(Packet.SPGameWin(seat));
 		
+		controller.gameEnd(seat);
+	}
+	
+	private void printPacket(byte[] p) {
+		System.out.println("Recieved Packet:");
+		System.out.printf("%2d ", p[0]);
+		for (int i = 1; i < p.length; i++) {
+			System.out.printf("%2x ", p[i]);
+		}
+		System.out.println();
 	}
 
 }

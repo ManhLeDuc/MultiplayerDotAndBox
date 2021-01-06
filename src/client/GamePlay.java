@@ -1,4 +1,4 @@
-package client.gameGUI;
+package client;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -26,7 +26,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 
-import client.solver.GameSolver;
 import game.Board;
 import game.ColorTeam;
 import game.Edge;
@@ -41,10 +40,11 @@ public class GamePlay {
 	private Board board;
 	private int turn;
 	private boolean mouseEnabled;
+	private Controller currentController;
 
-	GameSolver redSolver, blueSolver, solver;
-	String redName, blueName;
-	Main parent;
+//	GameSolver redSolver, blueSolver, solver;
+//	String redName, blueName;
+//	Main parent;
 
 	private JLabel[][] hEdge, vEdge, box;
 	private boolean[][] isSetHEdge, isSetVEdge;
@@ -145,12 +145,12 @@ public class GamePlay {
 		if (ret.isEmpty()) {
 			if (turn == ColorTeam.RED) {
 				turn = ColorTeam.BLUE;
-				solver = blueSolver;
+				//solver = blueSolver;
 				statusLabel.setText("Player-2's Turn...");
 				statusLabel.setForeground(Color.BLUE);
 			} else {
 				turn = ColorTeam.RED;
-				solver = redSolver;
+				//solver = redSolver;
 				statusLabel.setText("Player-1's Turn...");
 				statusLabel.setForeground(Color.RED);
 			}
@@ -160,21 +160,21 @@ public class GamePlay {
 	}
 
 	private void manageGame() {
-		while (!board.isComplete()) {
-			if (goBack)
-				return;
-			if (solver == null) {
-				mouseEnabled = true;
-			} else {
-				mouseEnabled = false;
-				processMove(solver.getNextMove(board, turn));
-			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+//		while (!board.isComplete()) {
+//			if (goBack)
+//				return;
+//			if (solver == null) {
+//				mouseEnabled = true;
+//			} else {
+//				mouseEnabled = false;
+//				processMove(solver.getNextMove(board, turn));
+//			}
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 	private Edge getSource(Object object) {
@@ -228,25 +228,17 @@ public class GamePlay {
 		return label;
 	}
 
-	public GamePlay(Main parent, JFrame frame, int n, GameSolver redSolver, GameSolver blueSolver, String redName,
-			String blueName) {
-		this.parent = parent;
-		this.frame = frame;
+	public GamePlay(int n, Controller controller) {
+		this.currentController = controller;
+		this.frame = new JFrame();
 		this.n = n;
-		this.redSolver = redSolver;
-		this.blueSolver = blueSolver;
-		this.redName = redName;
-		this.blueName = blueName;
 		initGame();
 	}
-
-	private boolean goBack;
 
 	private ActionListener backListener = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			goBack = true;
-			board.clear();
+			currentController.requestGameEnd();
 		}
 	};
 
@@ -273,7 +265,7 @@ public class GamePlay {
 		board = new Board(n);
 		int boardWidth = n * size + (n - 1) * dist;
 		turn = ColorTeam.RED;
-		solver = redSolver;
+//		solver = redSolver;
 
 		JPanel grid = new JPanel(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
@@ -288,8 +280,8 @@ public class GamePlay {
 			playerPanel.setPreferredSize(new Dimension(2 * boardWidth, 2 * dist));
 		playerPanel.add(new JLabel("<html><font color='red'>Player-1:", SwingConstants.CENTER));
 		playerPanel.add(new JLabel("<html><font color='blue'>Player-2:", SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='red'>" + redName, SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='blue'>" + blueName, SwingConstants.CENTER));
+		playerPanel.add(new JLabel("<html><font color='red'>" + "Red", SwingConstants.CENTER));
+		playerPanel.add(new JLabel("<html><font color='blue'>" + "Blue", SwingConstants.CENTER));
 		++constraints.gridy;
 		grid.add(playerPanel, constraints);
 
@@ -390,18 +382,14 @@ public class GamePlay {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		
-		goBack = false;
+
 		manageGame();
 
-		while (!goBack) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		parent.initGUI();
+	}
+	
+	public void destroy() {
+		frame.setVisible(false);
+		frame.dispose();
 	}
 
 }

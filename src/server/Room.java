@@ -6,7 +6,8 @@ public class Room {
 	public static Room[] global = new Room[50];
 	int id = -1;
 	Player[] players = new Player[2];
-	
+
+	Game currentGame = null;
 
 	public Player[] getPlayers() {
 		return players;
@@ -26,7 +27,7 @@ public class Room {
 		if (id == -1) {
 			throw new FullServerException();
 		}
-			
+
 	}
 
 	public synchronized void outputTable(byte[] p) {
@@ -54,12 +55,22 @@ public class Room {
 	}
 
 	public void leave(Player him) {
+
 		synchronized (global) { // critical section
 			synchronized (this) {
+				if(this.currentGame!=null)
+					return;
+				if (him == null) {
+					return;
+				}
 				if (him.room != this)
 					return;
 				// announce to all; player id of -1 means leaving table
 				Player.outputAll(Packet.SPRoomPlayer(id, him.seat, -1));
+				if (him.seat == 0) {
+					Player otherPlayer = him.room.players[1];
+					this.leave(otherPlayer);
+				}
 				players[him.seat] = null;
 				him.room = null;
 				him.seat = -1;
@@ -79,4 +90,41 @@ public class Room {
 		}
 	}
 	// other methods...
+
+	public void startGame(int boardSize) {
+		synchronized (this) {
+			for (int i = 0; i < players.length; i++)
+				if (players[i] == null)
+					return;
+			if (this.currentGame != null) {
+				return;
+			}
+			this.currentGame = new Game(boardSize);
+			for (int i = 0; i < players.length; i++) {
+				if (players[i] != null)
+					players[i].output(Packet.SPGameStart(boardSize));
+			}
+		}
+
+	}
+	
+	public void endGame(int seat) {
+		synchronized (this) {
+			for (int i = 0; i < players.length; i++)
+				if (players[i] == null)
+					return;
+//			if (this.currentGame == null) {
+//				return;
+//			}
+			
+			for (int i = 0; i < players.length; i++) {
+				if (players[i] != null) {
+					players[i].output(Packet.SPGameWin(seat));
+					System.out.println("Sent packet");
+				}
+					
+			}
+			this.currentGame = null;
+		}
+	}
 }
