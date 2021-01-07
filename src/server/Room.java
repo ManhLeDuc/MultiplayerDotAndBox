@@ -44,7 +44,7 @@ public class Room {
 					players[i] = him;
 					him.room = this;
 					him.seat = i;
-					Player.outputAll(Packet.SPRoomPlayer(id, i, him.id));
+					Player.outputAll(Packet.SPRoomPlayer(id, i, him.id, him.getAccount().getUserName()));
 					break join;
 				}
 			}
@@ -73,7 +73,7 @@ public class Room {
 				if (him.room != this)
 					return;
 				// announce to all; player id of -1 means leaving table
-				Player.outputAll(Packet.SPRoomPlayer(id, him.seat, -1));
+				Player.outputAll(Packet.SPRoomPlayer(id, him.seat, -1, him.getAccount().getUserName()));
 				if (him.seat == 0) {
 					Player otherPlayer = him.room.players[1];
 					this.leave(otherPlayer);
@@ -93,7 +93,7 @@ public class Room {
 	public synchronized void update(Player him) {
 		for (int i = 0; i < players.length; i++) {
 			if (players[i] != null)
-				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id));
+				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id,him.getAccount().getUserName()));
 		}
 	}
 	// other methods...

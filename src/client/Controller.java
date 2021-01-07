@@ -36,11 +36,14 @@ public class Controller {
 	}
 
 	public void disconnect() {
-		currentClient.output(Packet.CPQuit());
 		loginGUI.setVisible(true);
 		roomListGUI.setVisible(false);
 		roomGUI.setVisible(false);
 		currentClient = null;
+	}
+	
+	public void requestDisconnect() {
+		currentClient.output(Packet.CPQuit());
 	}
 
 	public void loginController(String userName, String password) {
@@ -79,20 +82,20 @@ public class Controller {
 	}
 
 	public void roomPlayer(int roomId, int seat, int playerId, String userName) {
-		roomListGUI.roomPlayer(roomId, seat, playerId);
+		roomListGUI.roomPlayer(roomId, seat, playerId, userName);
 		if (playerId == currentClient.myID) {
 			enterRoom(roomId);
 		}
 		if (currentRoomId == roomId) {
-			roomGUI.update(seat, playerId);
+			roomGUI.update(seat, playerId, userName);
 		}
 	}
 
 	public void enterRoom(int roomId) {
 		roomListGUI.setVisible(false);
 		roomGUI.setVisible(true);
-		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0));
-		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1));
+		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0),  roomListGUI.getPlayerNameFromRoom(roomId, 0));
+		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1), roomListGUI.getPlayerNameFromRoom(roomId, 1));
 		currentRoomId = roomId;
 	}
 
@@ -116,7 +119,9 @@ public class Controller {
 	
 	public void startGame(int boardSize) {
 		roomGUI.setVisible(false);
-		this.gamePlayGUI = new GamePlay(boardSize, this, this.roomGUI.getMySeat());
+		String player1 = roomGUI.getPlayer1Name();
+		String player2 = roomGUI.getPlayer2Name();
+		this.gamePlayGUI = new GamePlay(boardSize, this, this.roomGUI.getMySeat(), player1, player2);
 		
 	}
 	

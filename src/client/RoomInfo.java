@@ -21,7 +21,18 @@ public class RoomInfo extends JPanel {
 	private RoomListGUI currentRoomListGUI;
 	
 	private int player1Id = -1;
+	private String player1Name; 
+	
 	private int player2Id = -1;
+	private String player2Name;
+	
+	public String getPlayer1Name() {
+		return player1Name;
+	}
+
+	public String getPlayer2Name() {
+		return player2Name;
+	}
 	
 	public int getPlayer2Id() {
 		return player2Id;
@@ -68,15 +79,19 @@ public class RoomInfo extends JPanel {
 
 	}
 	
-	public void addPlayer(int seat, int playerId) {
+	public void addPlayer(int seat, int playerId, String userName) {
 		if(this.playerNum == 0) {
 			this.setVisible(true);
 		}
 		if(seat == 0) {
 			this.player1Id = playerId;
+			this.player1Name = userName;
+			System.out.println(this.player1Name);
 		}
 		else if(seat == 1) {
 			this.player2Id = playerId;
+			this.player2Name = userName;
+			System.out.println(this.player1Name);
 		}
 		if(this.playerNum<2) {
 			this.playerNum = this.playerNum + 1;
@@ -88,9 +103,11 @@ public class RoomInfo extends JPanel {
 		if(this.playerNum>0) {
 			if(seat == 0) {
 				this.player1Id = -1;
+				this.player1Name = null;
 			}
 			else if(seat == 1) {
 				this.player2Id = -1;
+				this.player2Name = null;
 			}
 			this.playerNum -= 1;
 			lblPlayerNumber.setText((String.valueOf(playerNum)+"/2"));

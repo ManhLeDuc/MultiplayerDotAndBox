@@ -88,7 +88,7 @@ public class Client implements Runnable {
 				}
 
 			} catch (IOException e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				break loop;
 			}
 		}
@@ -151,8 +151,9 @@ public class Client implements Runnable {
 		int roomId = in.readInt();
 		int seat = in.readInt();
 		int playerId = in.readInt();
-		printPacket(Packet.SPRoomPlayer(roomId, seat, playerId));
-		controller.roomPlayer(roomId, seat, playerId, myName);
+		String otherUserName = in.readUTF();
+		printPacket(Packet.SPRoomPlayer(roomId, seat, playerId, otherUserName));
+		controller.roomPlayer(roomId, seat, playerId, otherUserName);
 	}
 	
 	void hdGameStart() throws IOException {

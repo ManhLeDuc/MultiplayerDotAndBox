@@ -110,9 +110,9 @@ public class RoomListGUI extends JFrame {
 		lblUserId.setText(userName);
 	}
 	
-	public void roomPlayer(int roomId, int seat, int playerId) {
+	public void roomPlayer(int roomId, int seat, int playerId, String userName) {
 		if(playerId!=-1) {
-			roomInfoList[roomId].addPlayer(seat, playerId);
+			roomInfoList[roomId].addPlayer(seat, playerId, userName);
 		}
 		else {
 			roomInfoList[roomId].removePlayer(seat);
@@ -137,6 +137,16 @@ public class RoomListGUI extends JFrame {
 		else return -1;	
 	}
 	
+	public String getPlayerNameFromRoom(int roomId, int seat) {
+		if(seat == 0) {
+			return roomInfoList[roomId].getPlayer1Name();
+		}
+		else if(seat == 1) {
+			return roomInfoList[roomId].getPlayer2Name();
+		}
+		else return null;	
+	}
+	
 	public void joinRoom(int roomId) {
 		controller.requestJoinRoom(roomId);
 	}
@@ -144,7 +154,7 @@ public class RoomListGUI extends JFrame {
 	private ActionListener logout = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent actionEvent) {
-			controller.disconnect();
+			controller.requestDisconnect();
 		}
 	};
 	

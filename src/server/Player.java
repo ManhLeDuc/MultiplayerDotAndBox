@@ -11,6 +11,7 @@ class Player extends Thread {
 	public static Player[] global = new Player[100];
 	public int id = -1;
 	private Account account = null;
+
 	private Socket sock;
 	private DataInputStream in;
 	private DataOutputStream out;
@@ -18,6 +19,10 @@ class Player extends Thread {
 	private PlayerOutput out_thread = null;
 	public Room room = null;
 	public int seat = -1;
+	
+	public Account getAccount() {
+		return account;
+	}
 
 	public Player(Socket s, DataInputStream in, DataOutputStream out) throws FullServerException {
 		synchronized (global) { // find a unique player id

@@ -27,6 +27,16 @@ public class RoomGUI extends JFrame {
 	private JRadioButton[] sizeButton;
 	private ButtonGroup sizeGroup;
 	private int mySeat = -1;
+	private String player1Name;
+	public String getPlayer1Name() {
+		return player1Name;
+	}
+
+	public String getPlayer2Name() {
+		return player2Name;
+	}
+
+	private String player2Name; 
 	
 
 	public int getMySeat() {
@@ -118,7 +128,7 @@ public class RoomGUI extends JFrame {
 		}
 	};
 	
-	public void update(int seat, int playerId) {
+	public void update(int seat, int playerId, String userName) {
 		if(playerId == controller.getMyId()) {
 			mySeat = seat;
 			if(mySeat == 0) {
@@ -130,17 +140,21 @@ public class RoomGUI extends JFrame {
 		if(seat == 0) {
 			if(playerId == -1) {
 				lblPlayer1Id.setText("No one is here");
+				this.player1Name = null;
 			}
 			else {
-				lblPlayer1Id.setText(String.valueOf(playerId));
+				lblPlayer1Id.setText(userName);
+				this.player1Name = userName;
 			}
 		}
 		else if(seat == 1) {
 			if(playerId == -1) {
 				lblPlayer2Id.setText("No one is here");
+				this.player2Name = null;
 			}
 			else {
-				lblPlayer2Id.setText(String.valueOf(playerId));
+				lblPlayer2Id.setText(userName);
+				this.player2Name = userName;
 			}
 		}
 		

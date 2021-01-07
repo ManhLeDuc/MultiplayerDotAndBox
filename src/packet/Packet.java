@@ -135,13 +135,14 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
-	public static byte[] SPRoomPlayer(int roomId, int seat, int playerId) {
+	public static byte[] SPRoomPlayer(int roomId, int seat, int playerId, String userName) {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(SP_ROOM_PLAYER); // write tag first
 			p.writeInt(roomId);
 			p.writeInt(seat);
 			p.writeInt(playerId);
+			p.writeUTF(userName);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;

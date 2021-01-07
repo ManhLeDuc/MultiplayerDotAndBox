@@ -7,6 +7,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,6 +25,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import game.Board;
@@ -44,6 +46,10 @@ public class GamePlay {
 
 	private JLabel[][] hEdge, vEdge, box;
 	private boolean[][] isSetHEdge, isSetVEdge;
+
+	private JTextField chatTextFiled;
+	private JLabel player1Chat;
+	private JLabel player2Chat;
 
 	private JFrame frame;
 	private JLabel redScoreLabel, blueScoreLabel, statusLabel;
@@ -106,7 +112,7 @@ public class GamePlay {
 		boolean isHorizontal = location.isHorizontal();
 		this.mouseEnabled = false;
 		this.currentController.requestProcessMove(x, y, isHorizontal);
-		
+
 	}
 
 	public void processMove(int x, int y, boolean isHorizontal, int seat) {
@@ -137,22 +143,21 @@ public class GamePlay {
 		if (ret.isEmpty()) {
 			if (turn == ColorTeam.RED) {
 				turn = ColorTeam.BLUE;
-				if(turn == mySeat) {
+				if (turn == mySeat) {
 					this.mouseEnabled = true;
 				}
 				statusLabel.setText("Player-2's Turn...");
 				statusLabel.setForeground(Color.BLUE);
 			} else {
 				turn = ColorTeam.RED;
-				if(turn == mySeat) {
+				if (turn == mySeat) {
 					this.mouseEnabled = true;
 				}
 				statusLabel.setText("Player-1's Turn...");
 				statusLabel.setForeground(Color.RED);
 			}
-		}
-		else {
-			if(turn == mySeat) {
+		} else {
+			if (turn == mySeat) {
 				this.mouseEnabled = true;
 			}
 		}
@@ -223,11 +228,11 @@ public class GamePlay {
 		return label;
 	}
 
-	public GamePlay(int n, Controller controller, int seat) {
+	public GamePlay(int n, Controller controller, int seat, String player1, String player2) {
 		this.currentController = controller;
 		this.frame = new JFrame();
 		this.n = n;
-		initGame(seat);
+		initGame(seat, player1, player2);
 	}
 
 	private ActionListener backListener = new ActionListener() {
@@ -255,37 +260,63 @@ public class GamePlay {
 		}
 	};
 
-	private void initGame(int seat) {
+	private void initGame(int seat, String player1, String player2) {
 
 		board = new Board(n);
 		int boardWidth = n * size + (n - 1) * dist;
 		turn = ColorTeam.RED;
 		mySeat = seat;
-//		solver = redSolver;
 
 		JPanel grid = new JPanel(new GridBagLayout());
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		grid.add(getEmptyLabel(new Dimension(2 * boardWidth, 10)), constraints);
 
 		JPanel playerPanel = new JPanel(new GridLayout(2, 2));
+		player1Chat = new JLabel("", SwingConstants.CENTER);
+		player2Chat = new JLabel("", SwingConstants.CENTER);
+		player1Chat.setPreferredSize(new Dimension(boardWidth, boardWidth));
+//		player1Chat.setOpaque(true);
+		player1Chat.setBackground(Color.WHITE);
+		player2Chat.setPreferredSize(new Dimension(boardWidth, boardWidth));
+//		player2Chat.setOpaque(true);
+		player2Chat.setBackground(Color.WHITE);
+
 		if (n > 3)
-			playerPanel.setPreferredSize(new Dimension(2 * boardWidth, dist));
+			playerPanel.setPreferredSize(new Dimension(boardWidth+20, dist));
 		else
-			playerPanel.setPreferredSize(new Dimension(2 * boardWidth, 2 * dist));
+			playerPanel.setPreferredSize(new Dimension(boardWidth+20, dist));
+		
 		playerPanel.add(new JLabel("<html><font color='red'>Player-1:", SwingConstants.CENTER));
 		playerPanel.add(new JLabel("<html><font color='blue'>Player-2:", SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='red'>" + "Red", SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='blue'>" + "Blue", SwingConstants.CENTER));
+		playerPanel.add(new JLabel("<html><font color='red'>" + player1, SwingConstants.CENTER));
+		playerPanel.add(new JLabel("<html><font color='blue'>" + player2, SwingConstants.CENTER));
+		
 		++constraints.gridy;
+		constraints.insets = new Insets(20,10,0,0);
+		constraints.gridheight = 3;
+		grid.add(player1Chat, constraints);
+
+		++constraints.gridx;
+		constraints.gridheight = 1;
+		constraints.insets = new Insets(20,0,0,0);
+		constraints.gridwidth = 1;
 		grid.add(playerPanel, constraints);
 
+		++constraints.gridx;
+		constraints.gridheight = 3;
+		constraints.insets = new Insets(20,0,0,10);
+		grid.add(player2Chat, constraints);
+
+		constraints.gridx = 1;
+		constraints.insets = new Insets(0,0,0,0);
+		constraints.gridheight = 1;
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(2 * boardWidth, 10)), constraints);
+		
+		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
 
 		JPanel scorePanel = new JPanel(new GridLayout(2, 2));
-		scorePanel.setPreferredSize(new Dimension(2 * boardWidth, dist));
+		scorePanel.setPreferredSize(new Dimension(boardWidth+20, dist));
 		scorePanel.add(new JLabel("<html><font color='red'>Score:", SwingConstants.CENTER));
 		scorePanel.add(new JLabel("<html><font color='blue'>Score:", SwingConstants.CENTER));
 		redScoreLabel = new JLabel("0", SwingConstants.CENTER);
@@ -298,7 +329,7 @@ public class GamePlay {
 		grid.add(scorePanel, constraints);
 
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(2 * boardWidth, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
 
 		hEdge = new JLabel[n - 1][n];
 		isSetHEdge = new boolean[n - 1][n];
@@ -335,16 +366,18 @@ public class GamePlay {
 		}
 
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(2 * boardWidth, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(0, 10)), constraints);
 
 		statusLabel = new JLabel("Player-1's Turn...", SwingConstants.CENTER);
 		statusLabel.setForeground(Color.RED);
-		statusLabel.setPreferredSize(new Dimension(2 * boardWidth, dist));
+		statusLabel.setOpaque(true);
+		statusLabel.setBackground(Color.WHITE);
+		statusLabel.setPreferredSize(new Dimension(boardWidth+20, dist));
 		++constraints.gridy;
 		grid.add(statusLabel, constraints);
 
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(2 * boardWidth, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
 
 		JButton goBackButton = new JButton("Go Back to Main Menu");
 		goBackButton.setPreferredSize(new Dimension(boardWidth, dist));
@@ -352,8 +385,8 @@ public class GamePlay {
 		++constraints.gridy;
 		grid.add(goBackButton, constraints);
 
-		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(500, 25)), constraints);
+		constraints.insets = new Insets(15,0,0,0);
+
 		++constraints.gridy;
 		JPanel helpPanel = new JPanel(new GridLayout(1, 2));
 		Image img = null;
@@ -368,9 +401,9 @@ public class GamePlay {
 		questionButton.addActionListener(questionListener);
 
 		helpPanel.add(questionButton);
+		constraints.insets = new Insets(15,0,15,0);
 		grid.add(helpPanel, constraints);
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(500, 25)), constraints);
 
 		frame.getContentPane().removeAll();
 		frame.revalidate();
@@ -392,6 +425,10 @@ public class GamePlay {
 	public void destroy() {
 		frame.setVisible(false);
 		frame.dispose();
+	}
+
+	public static void main(String args[]) {
+		new GamePlay(4, null, 0, "ngu", "ngoc");
 	}
 
 }
