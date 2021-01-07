@@ -75,6 +75,17 @@ public class Box {
 		return false;
 	}
 	public int sethEdge(int x, int y, int color) {
+		if(checkBox() == true)
+		{
+			if(this.trangthai == ColorTeam.BLANK) {
+				this.trangthai = color;
+				return 2;
+			}
+			else {
+				return 0;
+			}
+				
+		}
 		if(hDEdge.updateColor(x, y) == false && hTEdge.updateColor(x, y) == false)
 			return 0;
 		if(checkBox() == true)
@@ -86,6 +97,7 @@ public class Box {
 	}
 	
 	public int setvEdge(int x, int y, int color) {
+		
 		if(vLEdge.updateColor(x, y) == false && vREdge.updateColor(x, y) == false)
 			return 0;
 		if(checkBox() == true)

@@ -4,7 +4,6 @@ public class Edge {
 	private int x, y;
 	private boolean horizontal;
 	private int colorOfEdge;
-//	private Box[] boxs;
 	public Edge( ) {
 		x = y = -1;
 		horizontal = false;

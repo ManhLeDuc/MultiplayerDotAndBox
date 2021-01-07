@@ -104,8 +104,9 @@ public class GamePlay {
 	private void processMove(Edge location) {
 		int x = location.getX(), y = location.getY();
 		boolean isHorizontal = location.isHorizontal();
-		this.currentController.requestProcessMove(x, y, isHorizontal);
 		this.mouseEnabled = false;
+		this.currentController.requestProcessMove(x, y, isHorizontal);
+		
 	}
 
 	public void processMove(int x, int y, boolean isHorizontal, int seat) {
@@ -148,6 +149,11 @@ public class GamePlay {
 				}
 				statusLabel.setText("Player-1's Turn...");
 				statusLabel.setForeground(Color.RED);
+			}
+		}
+		else {
+			if(turn == mySeat) {
+				this.mouseEnabled = true;
 			}
 		}
 	}
@@ -308,17 +314,20 @@ public class GamePlay {
 				pane.add(getDot());
 				for (int j = 0; j < (n - 1); j++) {
 					hEdge[j][i / 2] = getHorizontalEdge();
+					hEdge[j][i / 2].setBackground(Color.WHITE);
 					pane.add(hEdge[j][i / 2]);
 					pane.add(getDot());
 				}
 			} else {
 				for (int j = 0; j < (n - 1); j++) {
 					vEdge[j][i / 2] = getVerticalEdge();
+					vEdge[j][i / 2].setBackground(Color.WHITE);
 					pane.add(vEdge[j][i / 2]);
 					box[j][i / 2] = getBox();
 					pane.add(box[j][i / 2]);
 				}
 				vEdge[n - 1][i / 2] = getVerticalEdge();
+				vEdge[n - 1][i / 2].setBackground(Color.WHITE);
 				pane.add(vEdge[n - 1][i / 2]);
 			}
 			++constraints.gridy;

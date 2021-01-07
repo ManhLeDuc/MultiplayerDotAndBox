@@ -92,7 +92,7 @@ public class Board implements Cloneable {
 		ArrayList<Point> ret = new ArrayList<Point>();
 		int numb = x + y * (n - 1);
 		int i = 0;
-
+		int fail = 0;
 		if (y < (n - 1)) {
 			i = box.get(numb).sethEdge(x, y, color);
 			if (i == 2) {
@@ -102,10 +102,10 @@ public class Board implements Cloneable {
 				else
 					blueScore++;
 			} else if (i == 0) {
-				return null;
+				fail += 1;
 			}
 		}
-		if (y > 0 && box.get(numb - n + 1).sethEdge(x, y, color) == 2) {
+		if (y > 0) {
 			i = box.get(numb - n + 1).sethEdge(x, y, color);
 			if (i == 2) {
 				ret.add(new Point(x, y - 1));
@@ -114,17 +114,20 @@ public class Board implements Cloneable {
 				else
 					blueScore++;
 			} else if (i == 0) {
-				return null;
+				fail += 1;
 			}
 		}
+		if(fail==2)
+			return null;
 		return ret;
 	}
 
 	public ArrayList<Point> setVEdge(int x, int y, int color) {
 		ArrayList<Point> ret = new ArrayList<Point>();
-
+		
 		int numb = x + y * (n - 1);
 		int i = 0;
+		int fail = 0;
 		if (x < (n - 1)) {
 			i = box.get(numb).setvEdge(x, y, color);
 			if (i == 2) {
@@ -134,7 +137,7 @@ public class Board implements Cloneable {
 				else
 					blueScore++;
 			} else if (i == 0) {
-				return null;
+				fail += 1;
 			}
 
 		}
@@ -147,9 +150,11 @@ public class Board implements Cloneable {
 				else
 					blueScore++;
 			} else if (i == 0) {
-				return null;
+				fail += 1;
 			}
 		}
+		if(fail==2)
+			return null;
 		return ret;
 	}
 

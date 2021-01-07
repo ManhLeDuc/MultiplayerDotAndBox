@@ -58,8 +58,15 @@ public class Room {
 
 		synchronized (global) { // critical section
 			synchronized (this) {
-				if(this.currentGame!=null)
-					return;
+				if(this.currentGame!=null) {
+					for (int i = 0; i < players.length; i++) {
+						if (players[i] != null) {
+							int winnerSeat = him.seat==0?1:0;
+							players[i].output(Packet.SPGameWin(winnerSeat));
+						}		
+					}
+				}
+					
 				if (him == null) {
 					return;
 				}
@@ -117,9 +124,7 @@ public class Room {
 			for (int i = 0; i < players.length; i++) {
 				if (players[i] != null) {
 					players[i].output(Packet.SPGameWin(seat));
-					System.out.println("Sent packet");
-				}
-					
+				}		
 			}
 			this.currentGame = null;
 		}
