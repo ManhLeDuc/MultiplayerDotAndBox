@@ -5,9 +5,9 @@ import packet.Packet;
 public class Room {
 	public static Room[] global = new Room[50];
 	int id = -1;
-	Player[] players = new Player[2];
+	private Player[] players = new Player[2];
 
-	Game currentGame = null;
+	ServerGame currentGame = null;
 
 	public Player[] getPlayers() {
 		return players;
@@ -99,7 +99,7 @@ public class Room {
 			if (this.currentGame != null) {
 				return;
 			}
-			this.currentGame = new Game(boardSize);
+			this.currentGame = new ServerGame(boardSize, this);
 			for (int i = 0; i < players.length; i++) {
 				if (players[i] != null)
 					players[i].output(Packet.SPGameStart(boardSize));
@@ -113,9 +113,6 @@ public class Room {
 			for (int i = 0; i < players.length; i++)
 				if (players[i] == null)
 					return;
-//			if (this.currentGame == null) {
-//				return;
-//			}
 			
 			for (int i = 0; i < players.length; i++) {
 				if (players[i] != null) {
@@ -125,6 +122,14 @@ public class Room {
 					
 			}
 			this.currentGame = null;
+		}
+	}
+	
+	public void processMove(int x, int y, boolean isHorizontal, int seat) {
+		synchronized (this) {
+			if(this.currentGame!=null) {
+				this.currentGame.processMove(x, y, isHorizontal, seat);
+			}
 		}
 	}
 }

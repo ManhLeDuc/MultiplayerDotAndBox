@@ -79,6 +79,9 @@ public class Client implements Runnable {
 					case Packet.SP_GAME_WIN:
 						hdGameWin();
 						break;
+					case Packet.SP_GAME_MOVE:
+						hdGameMove();
+						break;
 					}
 					
 				}
@@ -166,6 +169,16 @@ public class Client implements Runnable {
 		printPacket(Packet.SPGameWin(seat));
 		
 		controller.gameEnd(seat);
+	}
+	
+	void hdGameMove() throws IOException {
+		int x = in.readInt();
+		int y = in.readInt();
+		boolean isHorizontal = in.readBoolean();
+		int seat = in.readInt();
+		printPacket(Packet.SPGameMove(x, y, isHorizontal, seat));
+		
+		controller.processMove(x, y, isHorizontal, seat);
 	}
 	
 	private void printPacket(byte[] p) {

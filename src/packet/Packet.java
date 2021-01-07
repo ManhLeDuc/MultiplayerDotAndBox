@@ -180,6 +180,20 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
+	public static byte[] SPGameMove(int x, int y, boolean isHorizontal, int seat) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_GAME_MOVE); // write tag first
+			p.writeInt(x);
+			p.writeInt(y);
+			p.writeBoolean(isHorizontal);
+			p.writeInt(seat);			
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}	
+	
 	public static byte[] CPGameStart(int boardSize) {
 		try {
 			Packet p = New(10); // estimated size
@@ -195,6 +209,19 @@ public class Packet extends DataOutputStream {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(CP_GAME_SURRENDER); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPGameMove(int x, int y, boolean isHorizontal) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_GAME_MOVE); // write tag first
+			p.writeInt(x);
+			p.writeInt(y);
+			p.writeBoolean(isHorizontal);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;

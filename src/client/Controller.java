@@ -115,7 +115,7 @@ public class Controller {
 	
 	public void startGame(int boardSize) {
 		roomGUI.setVisible(false);
-		this.gamePlayGUI = new GamePlay(boardSize, this);
+		this.gamePlayGUI = new GamePlay(boardSize, this, this.roomGUI.getMySeat());
 		
 	}
 	
@@ -135,6 +135,16 @@ public class Controller {
 		if (currentClient != null)
 			currentClient.disconnect();
 		loginGUI.dispose();
+	}
+	
+	public void requestProcessMove(int x, int y, boolean isHorizontal) {
+		currentClient.output(Packet.CPGameMove(x, y, isHorizontal));
+		
+	}
+	
+	public void processMove(int x, int y, boolean isHorizontal, int seat) {
+		this.gamePlayGUI.processMove(x, y, isHorizontal, seat);
+		
 	}
 
 }

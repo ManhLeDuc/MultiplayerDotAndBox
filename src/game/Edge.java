@@ -51,7 +51,7 @@ public class Edge {
 	}
 	
 	public boolean updateColor(int x, int y) {
-		if(this.x == x && this.y == y)
+		if(this.x == x && this.y == y && this.colorOfEdge == ColorTeam.BLANK)
 			{
 				this.colorOfEdge = ColorTeam.BLACK;
 				return true;

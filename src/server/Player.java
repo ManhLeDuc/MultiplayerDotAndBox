@@ -110,6 +110,9 @@ class Player extends Thread {
 					case Packet.CP_GAME_SURRENDER:
 						hdGameSurrender();
 						break;
+					case Packet.CP_GAME_MOVE:
+						hdGameMove();
+						break;
 					// call other packet handlers
 					}
 				}
@@ -207,7 +210,21 @@ class Player extends Thread {
 			
 			try {
 				this.room.endGame(this.seat);
-				System.out.println("Test");
+			} catch (Exception e) {
+
+			}
+		}
+	}
+	
+	void hdGameMove() throws IOException {
+		int x = in.readInt();
+		int y = in.readInt();
+		boolean isHorizontal = in.readBoolean();
+		printPacket(Packet.CPGameMove(x, y, isHorizontal));
+		if (this.room != null && this.seat!=-1) {
+			
+			try {
+				this.room.processMove(x, y, isHorizontal, this.seat);
 			} catch (Exception e) {
 
 			}

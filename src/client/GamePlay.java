@@ -30,7 +30,6 @@ import game.Board;
 import game.ColorTeam;
 import game.Edge;
 
-
 public class GamePlay {
 
 	private final static int size = 8;
@@ -39,12 +38,9 @@ public class GamePlay {
 	private int n;
 	private Board board;
 	private int turn;
+	private int mySeat;
 	private boolean mouseEnabled;
 	private Controller currentController;
-
-//	GameSolver redSolver, blueSolver, solver;
-//	String redName, blueName;
-//	Main parent;
 
 	private JLabel[][] hEdge, vEdge, box;
 	private boolean[][] isSetHEdge, isSetVEdge;
@@ -107,8 +103,17 @@ public class GamePlay {
 
 	private void processMove(Edge location) {
 		int x = location.getX(), y = location.getY();
+		boolean isHorizontal = location.isHorizontal();
+		this.currentController.requestProcessMove(x, y, isHorizontal);
+		this.mouseEnabled = false;
+	}
+
+	public void processMove(int x, int y, boolean isHorizontal, int seat) {
+		if (turn != seat) {
+			return;
+		}
 		ArrayList<Point> ret;
-		if (location.isHorizontal()) {
+		if (isHorizontal) {
 			if (isSetHEdge[x][y])
 				return;
 			ret = board.setHEdge(x, y, turn);
@@ -128,53 +133,37 @@ public class GamePlay {
 		redScoreLabel.setText(String.valueOf(board.getRedScore()));
 		blueScoreLabel.setText(String.valueOf(board.getBlueScore()));
 
-		if (board.isComplete()) {
-			int winner = board.getWinner();
-			if (winner == ColorTeam.RED) {
-				statusLabel.setText("Player-1 is the winner!");
-				statusLabel.setForeground(Color.RED);
-			} else if (winner == ColorTeam.BLUE) {
-				statusLabel.setText("Player-2 is the winner!");
-				statusLabel.setForeground(Color.BLUE);
-			} else {
-				statusLabel.setText("Game Tied!");
-				statusLabel.setForeground(Color.BLACK);
-			}
-		}
-
 		if (ret.isEmpty()) {
 			if (turn == ColorTeam.RED) {
 				turn = ColorTeam.BLUE;
-				//solver = blueSolver;
+				if(turn == mySeat) {
+					this.mouseEnabled = true;
+				}
 				statusLabel.setText("Player-2's Turn...");
 				statusLabel.setForeground(Color.BLUE);
 			} else {
 				turn = ColorTeam.RED;
-				//solver = redSolver;
+				if(turn == mySeat) {
+					this.mouseEnabled = true;
+				}
 				statusLabel.setText("Player-1's Turn...");
 				statusLabel.setForeground(Color.RED);
 			}
 		}
-		
-
 	}
 
-	private void manageGame() {
-//		while (!board.isComplete()) {
-//			if (goBack)
-//				return;
-//			if (solver == null) {
-//				mouseEnabled = true;
-//			} else {
-//				mouseEnabled = false;
-//				processMove(solver.getNextMove(board, turn));
-//			}
-//			try {
-//				Thread.sleep(100);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
-//		}
+	public void GameWin(int seat) {
+
+		if (seat == ColorTeam.RED) {
+			statusLabel.setText("Player-1 is the winner!");
+			statusLabel.setForeground(Color.RED);
+		} else if (seat == ColorTeam.BLUE) {
+			statusLabel.setText("Player-2 is the winner!");
+			statusLabel.setForeground(Color.BLUE);
+		} else {
+			statusLabel.setText("Game Tied!");
+			statusLabel.setForeground(Color.BLACK);
+		}
 	}
 
 	private Edge getSource(Object object) {
@@ -228,11 +217,11 @@ public class GamePlay {
 		return label;
 	}
 
-	public GamePlay(int n, Controller controller) {
+	public GamePlay(int n, Controller controller, int seat) {
 		this.currentController = controller;
 		this.frame = new JFrame();
 		this.n = n;
-		initGame();
+		initGame(seat);
 	}
 
 	private ActionListener backListener = new ActionListener() {
@@ -260,11 +249,12 @@ public class GamePlay {
 		}
 	};
 
-	private void initGame() {
+	private void initGame(int seat) {
 
 		board = new Board(n);
 		int boardWidth = n * size + (n - 1) * dist;
 		turn = ColorTeam.RED;
+		mySeat = seat;
 //		solver = redSolver;
 
 		JPanel grid = new JPanel(new GridBagLayout());
@@ -358,8 +348,7 @@ public class GamePlay {
 		++constraints.gridy;
 		JPanel helpPanel = new JPanel(new GridLayout(1, 2));
 		Image img = null;
-		
-		
+
 		JButton questionButton = new JButton();
 		try {
 			img = ImageIO.read(getClass().getResource("./howtoplay.png"));
@@ -368,7 +357,7 @@ public class GamePlay {
 		}
 		questionButton.setIcon(new ImageIcon(img));
 		questionButton.addActionListener(questionListener);
-		
+
 		helpPanel.add(questionButton);
 		grid.add(helpPanel, constraints);
 		++constraints.gridy;
@@ -383,10 +372,14 @@ public class GamePlay {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 
-		manageGame();
+		if (mySeat == turn) {
+			mouseEnabled = true;
+		} else {
+			this.mouseEnabled = false;
+		}
 
 	}
-	
+
 	public void destroy() {
 		frame.setVisible(false);
 		frame.dispose();

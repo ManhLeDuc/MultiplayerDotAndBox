@@ -29,6 +29,10 @@ public class RoomGUI extends JFrame {
 	private int mySeat = -1;
 	
 
+	public int getMySeat() {
+		return mySeat;
+	}
+
 	/**
 	 * Create the frame.
 	 */
