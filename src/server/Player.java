@@ -148,6 +148,7 @@ class Player extends Thread {
 
 		if ((account = Account.login(username, password)) != null) {
 			output(Packet.SPLogin(id));
+			output(Packet.SPYouAre(id, username));
 			synchronized (Room.global) {
 				for (int i = 0; i < Room.global.length; i++) {
 					if (Room.global[i] != null) {

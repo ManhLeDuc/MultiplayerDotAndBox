@@ -61,10 +61,10 @@ public class Controller {
 		roomGUI.setVisible(false);
 	}
 
-	public void loginSuccess(int id) {
+	public void loginSuccess(int id, String userName) {
 		loginGUI.setVisible(false);
 		roomListGUI.setVisible(true);
-		roomListGUI.setUserName(String.valueOf(id));
+		roomListGUI.setUserName(userName);
 	}
 
 	public void loginFail() {

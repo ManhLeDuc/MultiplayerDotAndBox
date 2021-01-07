@@ -17,6 +17,7 @@ public class Client implements Runnable {
 	
 	Controller controller;
 	int myID = -1;
+	String myName;
 	private boolean connected = true;
 
 	public boolean isConnected() {
@@ -119,8 +120,9 @@ public class Client implements Runnable {
 	void hdYouAre() throws IOException {
 
 		myID = in.readInt();
+		myName = in.readUTF();
 		System.out.println(myID);
-		controller.loginSuccess(myID);
+		controller.loginSuccess(myID, myName);
 	}
 	
 	void hdLeave() throws IOException {
@@ -141,7 +143,7 @@ public class Client implements Runnable {
 		} else {
 			myID = tempId;
 			System.out.println(myID);
-			controller.loginSuccess(myID);
+			controller.loginSuccess(myID, myName);
 		}
 	}
 	

@@ -57,11 +57,12 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 
-	public static byte[] SPYouAre(int id) {
+	public static byte[] SPYouAre(int id, String username) {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(SP_YOU_ARE); // write tag first
 			p.writeInt(id); // write fields
+			p.writeUTF(username);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
