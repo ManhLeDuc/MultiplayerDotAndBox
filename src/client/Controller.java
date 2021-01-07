@@ -36,6 +36,7 @@ public class Controller {
 	}
 
 	public void disconnect() {
+		currentClient.output(Packet.CPQuit());
 		loginGUI.setVisible(true);
 		roomListGUI.setVisible(false);
 		roomGUI.setVisible(false);
@@ -83,15 +84,15 @@ public class Controller {
 			enterRoom(roomId);
 		}
 		if (currentRoomId == roomId) {
-			roomGUI.update(seat, playerId,userName);
+			roomGUI.update(seat, playerId);
 		}
 	}
 
 	public void enterRoom(int roomId) {
 		roomListGUI.setVisible(false);
 		roomGUI.setVisible(true);
-		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0), currentClient.myName);
-		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1), currentClient.myName);
+		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0));
+		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1));
 		currentRoomId = roomId;
 	}
 

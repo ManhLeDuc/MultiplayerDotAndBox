@@ -118,7 +118,7 @@ public class RoomGUI extends JFrame {
 		}
 	};
 	
-	public void update(int seat, int playerId, String userName) {
+	public void update(int seat, int playerId) {
 		if(playerId == controller.getMyId()) {
 			mySeat = seat;
 			if(mySeat == 0) {
@@ -132,7 +132,7 @@ public class RoomGUI extends JFrame {
 				lblPlayer1Id.setText("No one is here");
 			}
 			else {
-				lblPlayer1Id.setText(userName);
+				lblPlayer1Id.setText(String.valueOf(playerId));
 			}
 		}
 		else if(seat == 1) {
@@ -140,7 +140,7 @@ public class RoomGUI extends JFrame {
 				lblPlayer2Id.setText("No one is here");
 			}
 			else {
-				lblPlayer2Id.setText(userName);
+				lblPlayer2Id.setText(String.valueOf(playerId));
 			}
 		}
 		
