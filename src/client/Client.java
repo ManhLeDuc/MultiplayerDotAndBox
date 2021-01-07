@@ -152,7 +152,7 @@ public class Client implements Runnable {
 		int seat = in.readInt();
 		int playerId = in.readInt();
 		printPacket(Packet.SPRoomPlayer(roomId, seat, playerId));
-		controller.roomPlayer(roomId, seat, playerId);
+		controller.roomPlayer(roomId, seat, playerId, myName);
 	}
 	
 	void hdGameStart() throws IOException {

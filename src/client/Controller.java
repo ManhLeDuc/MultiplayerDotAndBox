@@ -44,7 +44,7 @@ public class Controller {
 
 	public void loginController(String userName, String password) {
 		try {
-			Socket s = new Socket("localhost", 5656);
+			Socket s = new Socket("192.168.1.226", 5656);
 			DataInputStream i = new DataInputStream(s.getInputStream());
 			DataOutputStream o = new DataOutputStream(s.getOutputStream());
 			currentClient = new Client(userName, password, s, i, o, this);
@@ -77,21 +77,21 @@ public class Controller {
 		currentClient.output(Packet.CPRoomOpt());
 	}
 
-	public void roomPlayer(int roomId, int seat, int playerId) {
+	public void roomPlayer(int roomId, int seat, int playerId, String userName) {
 		roomListGUI.roomPlayer(roomId, seat, playerId);
 		if (playerId == currentClient.myID) {
 			enterRoom(roomId);
 		}
 		if (currentRoomId == roomId) {
-			roomGUI.update(seat, playerId);
+			roomGUI.update(seat, playerId,userName);
 		}
 	}
 
 	public void enterRoom(int roomId) {
 		roomListGUI.setVisible(false);
 		roomGUI.setVisible(true);
-		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0));
-		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1));
+		roomGUI.update(0, roomListGUI.getPlayerIdFromRoom(roomId, 0), currentClient.myName);
+		roomGUI.update(1, roomListGUI.getPlayerIdFromRoom(roomId, 1), currentClient.myName);
 		currentRoomId = roomId;
 	}
 
