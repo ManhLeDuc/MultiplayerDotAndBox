@@ -58,19 +58,21 @@ public class ServerGame {
 		if (this.currentBoard.isComplete()) {
 			int winner = currentBoard.getWinner();
 			if (winner == ColorTeam.RED) {
-				for (int i = 0; i < this.currentRoom.getPlayers().length; i++) {
-					this.currentRoom.getPlayers()[i].output(Packet.SPGameWin(ColorTeam.RED));
-				}
+				gameWinner(winner);
 			} else if (winner == ColorTeam.BLUE) {
-				for (int i = 0; i < this.currentRoom.getPlayers().length; i++) {
-					this.currentRoom.getPlayers()[i].output(Packet.SPGameWin(ColorTeam.BLUE));
-				}
+				gameWinner(winner);
 			} else {
 				for (int i = 0; i < this.currentRoom.getPlayers().length; i++) {
-					this.currentRoom.getPlayers()[i].output(Packet.SPGameWin(-1));
+					gameWinner(-1);
 				}
 			}
+			
+			
 		}
+	}
+	
+	private void gameWinner(int seat) {
+		this.currentRoom.endGame(seat);
 	}
 
 }

@@ -7,7 +7,7 @@ public class Room {
 	int id = -1;
 	private Player[] players = new Player[2];
 
-	ServerGame currentGame = null;
+	private ServerGame currentGame = null;
 
 	public Player[] getPlayers() {
 		return players;
@@ -51,22 +51,17 @@ public class Room {
 			him.output(Packet.SPErrorPacket("Table is full."));
 			return;
 		}
-		// MahJong-related stuff here
 	}
 
 	public void leave(Player him) {
 
 		synchronized (global) { // critical section
 			synchronized (this) {
-				if(this.currentGame!=null) {
-					for (int i = 0; i < players.length; i++) {
-						if (players[i] != null) {
-							int winnerSeat = him.seat==0?1:0;
-							players[i].output(Packet.SPGameWin(winnerSeat));
-						}		
-					}
+				if (this.currentGame != null) {
+					int winnerSeat = (him.seat == 0 ? 1 : 0);
+					this.endGame(winnerSeat);
 				}
-					
+
 				if (him == null) {
 					return;
 				}
@@ -93,46 +88,48 @@ public class Room {
 	public synchronized void update(Player him) {
 		for (int i = 0; i < players.length; i++) {
 			if (players[i] != null)
-				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id,him.getAccount().getUserName()));
+				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id, him.getAccount().getUserName()));
 		}
 	}
-	// other methods...
 
-	public void startGame(int boardSize) {
-		synchronized (this) {
-			for (int i = 0; i < players.length; i++)
-				if (players[i] == null)
-					return;
-			if (this.currentGame != null) {
+	public synchronized void startGame(int boardSize) {
+
+		for (int i = 0; i < players.length; i++)
+			if (players[i] == null)
 				return;
-			}
-			this.currentGame = new ServerGame(boardSize, this);
-			for (int i = 0; i < players.length; i++) {
-				if (players[i] != null)
-					players[i].output(Packet.SPGameStart(boardSize));
-			}
+		if (this.currentGame != null) {
+			return;
+		}
+		this.currentGame = new ServerGame(boardSize, this);
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] != null)
+				players[i].output(Packet.SPGameStart(boardSize));
 		}
 
 	}
-	
-	public void endGame(int seat) {
-		synchronized (this) {
-			for (int i = 0; i < players.length; i++)
-				if (players[i] == null)
-					return;
-			
-			for (int i = 0; i < players.length; i++) {
-				if (players[i] != null) {
-					players[i].output(Packet.SPGameWin(seat));
-				}		
-			}
-			this.currentGame = null;
+
+	public synchronized void endGame(int seat) {
+		if(this.currentGame == null) {
+			return;
 		}
+		
+		for (int i = 0; i < players.length; i++)
+			if (players[i] == null)
+				return;
+		
+		Elo.EloRating(players[0].getAccount(), players[1].getAccount(), seat);
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] != null) {
+				players[i].output(Packet.SPGameWin(seat));
+			}
+		}
+		this.currentGame = null;
+
 	}
-	
+
 	public void processMove(int x, int y, boolean isHorizontal, int seat) {
 		synchronized (this) {
-			if(this.currentGame!=null) {
+			if (this.currentGame != null) {
 				this.currentGame.processMove(x, y, isHorizontal, seat);
 			}
 		}
