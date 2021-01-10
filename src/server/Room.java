@@ -126,6 +126,14 @@ public class Room {
 		this.currentGame = null;
 
 	}
+	
+	public synchronized void sendMessage(String text, int seat) {
+		for (int i = 0; i < players.length; i++) {
+			if (players[i] != null) {
+				players[i].output(Packet.SPMessage(text, seat));
+			}
+		}
+	}
 
 	public void processMove(int x, int y, boolean isHorizontal, int seat) {
 		synchronized (this) {

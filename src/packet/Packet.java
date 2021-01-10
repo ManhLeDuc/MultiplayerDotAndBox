@@ -103,11 +103,12 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
-	public static byte[] SPMessage(String message) {
+	public static byte[] SPMessage(String message, int seat) {
 		try {
 			Packet p = New(20); // estimated size
 			p.writeByte(SP_MESSAGE); // write tag first
 			p.writeUTF(message);
+			p.writeInt(seat);		
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
@@ -116,7 +117,7 @@ public class Packet extends DataOutputStream {
 	
 	public static byte[] CPMessage(String message) {
 		try {
-			Packet p = New(10); // estimated size
+			Packet p = New(20); // estimated size
 			p.writeByte(CP_MESSAGE); // write tag first
 			p.writeUTF(message);
 			return p.buf(); // return the buffer

@@ -179,5 +179,9 @@ public class RoomGUI extends JFrame {
 		
 		
 	}
+	
+	public void handleMessage(String message, int seat) {
+		
+	}
 
 }

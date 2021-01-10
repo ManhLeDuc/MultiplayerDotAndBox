@@ -92,13 +92,9 @@ public class Client implements Runnable {
 				break loop;
 			}
 		}
-		System.out.println("Close");
+		System.out.println("Disconnected");
 		this.stop();
 		disconnect();
-	}
-
-	public void sendMessage(String message) {
-		output(Packet.CPMessage(message));
 	}
 
 	void disconnect() {
@@ -121,7 +117,6 @@ public class Client implements Runnable {
 
 		myID = in.readInt();
 		myName = in.readUTF();
-		System.out.println(myID);
 		controller.loginSuccess(myID, myName);
 	}
 	
@@ -131,18 +126,20 @@ public class Client implements Runnable {
 
 	void hdMessage() throws IOException {
 		String message = in.readUTF();
-		System.out.println(message);
+		int seat = in.readInt();
+		printPacket(Packet.SPMessage(message, seat));
+		this.controller.handleMessage(message, seat);
 	}
 
 	void hdLogin() throws IOException {
 		int tempId = in.readInt();
+		printPacket(Packet.SPLogin(tempId));
 		if (tempId == -1) {
 			output(Packet.CPQuit());
 			disconnect();
 			controller.loginFail();
 		} else {
 			myID = tempId;
-			System.out.println(myID);
 			controller.loginSuccess(myID, myName);
 		}
 	}
@@ -167,10 +164,8 @@ public class Client implements Runnable {
 	}
 	
 	void hdGameWin() throws IOException {
-		System.out.println("Hello");
 		int seat = in.readInt();
-		printPacket(Packet.SPGameWin(seat));
-		
+		printPacket(Packet.SPGameWin(seat));	
 		controller.gameEnd(seat);
 	}
 	

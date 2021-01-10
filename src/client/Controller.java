@@ -15,8 +15,8 @@ public class Controller {
 	private LoginGUI loginGUI;
 	private RoomListGUI roomListGUI;
 	private RoomGUI roomGUI;
-	private GamePlay gamePlayGUI;
-	private int currentRoomId;
+	private GamePlay gamePlayGUI = null;
+	private int currentRoomId = -1;
 	
 
 	public int getMyId() {
@@ -48,7 +48,7 @@ public class Controller {
 
 	public void loginController(String userName, String password) {
 		try {
-			Socket s = new Socket("192.168.1.226", 5656);
+			Socket s = new Socket("localhost", 5656);
 			DataInputStream i = new DataInputStream(s.getInputStream());
 			DataOutputStream o = new DataOutputStream(s.getOutputStream());
 			currentClient = new Client(userName, password, s, i, o, this);
@@ -141,6 +141,9 @@ public class Controller {
 		if (currentClient != null)
 			currentClient.disconnect();
 		loginGUI.dispose();
+		if(this.gamePlayGUI!=null) {
+			this.gamePlayGUI.destroy();
+		}
 	}
 	
 	public void requestProcessMove(int x, int y, boolean isHorizontal) {
@@ -151,6 +154,19 @@ public class Controller {
 	public void processMove(int x, int y, boolean isHorizontal, int seat) {
 		this.gamePlayGUI.processMove(x, y, isHorizontal, seat);
 		
+	}
+	
+	public void handleMessage(String message, int seat) {
+		if(this.currentRoomId != -1) {
+			this.roomGUI.handleMessage(message, seat);
+			if(this.gamePlayGUI != null) {
+				this.gamePlayGUI.handleMessage(message, seat);
+			}
+		}
+	}
+	
+	public void requestMessage(String message) {
+		this.currentClient.output(Packet.CPMessage(message));
 	}
 
 }

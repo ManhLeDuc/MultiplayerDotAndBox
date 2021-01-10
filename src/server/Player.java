@@ -142,7 +142,11 @@ class Player extends Thread {
 	void hdMessage() throws IOException {
 
 		String text = in.readUTF();
-		output(Packet.SPMessage(text));
+		printPacket(Packet.CPMessage(text));
+		
+		if(this.room != null && seat!= -1) {
+			this.room.sendMessage(text, this.seat);
+		}
 	}
 
 	void hdLogin() throws IOException {
@@ -238,7 +242,7 @@ class Player extends Thread {
 	}
 
 	private void printPacket(byte[] p) {
-		System.out.println("Recieved Packet:");
+		System.out.printf("Recieved Packet from:\n");
 		System.out.printf("%2d ", p[0]);
 		for (int i = 1; i < p.length; i++) {
 			System.out.printf("%2x ", p[i]);

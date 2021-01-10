@@ -27,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 
 import game.Board;
 import game.ColorTeam;
@@ -47,9 +48,12 @@ public class GamePlay {
 	private JLabel[][] hEdge, vEdge, box;
 	private boolean[][] isSetHEdge, isSetVEdge;
 
-	private JTextField chatTextFiled;
+	private JTextField chatTextField;
 	private JLabel player1Chat;
 	private JLabel player2Chat;
+
+	private Timer player1Timer = null;
+	private Timer player2Timer = null;
 
 	private JFrame frame;
 	private JLabel redScoreLabel, blueScoreLabel, statusLabel;
@@ -272,51 +276,61 @@ public class GamePlay {
 		constraints.gridx = 0;
 		constraints.gridy = 0;
 
-		JPanel playerPanel = new JPanel(new GridLayout(2, 2));
 		player1Chat = new JLabel("", SwingConstants.CENTER);
 		player2Chat = new JLabel("", SwingConstants.CENTER);
 		player1Chat.setPreferredSize(new Dimension(boardWidth, boardWidth));
-//		player1Chat.setOpaque(true);
 		player1Chat.setBackground(Color.WHITE);
 		player2Chat.setPreferredSize(new Dimension(boardWidth, boardWidth));
-//		player2Chat.setOpaque(true);
 		player2Chat.setBackground(Color.WHITE);
 
+		this.player1Timer = new Timer(5000, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				closeMessage(0);
+			}
+		});
+
+		this.player2Timer = new Timer(5000, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				closeMessage(1);
+			}
+		});
+
+		JPanel playerPanel = new JPanel(new GridLayout(2, 2));
 		if (n > 3)
-			playerPanel.setPreferredSize(new Dimension(boardWidth+20, dist));
+			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
 		else
-			playerPanel.setPreferredSize(new Dimension(boardWidth+20, dist));
-		
+			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
+
 		playerPanel.add(new JLabel("<html><font color='red'>Player-1:", SwingConstants.CENTER));
 		playerPanel.add(new JLabel("<html><font color='blue'>Player-2:", SwingConstants.CENTER));
 		playerPanel.add(new JLabel("<html><font color='red'>" + player1, SwingConstants.CENTER));
 		playerPanel.add(new JLabel("<html><font color='blue'>" + player2, SwingConstants.CENTER));
-		
+
 		++constraints.gridy;
-		constraints.insets = new Insets(20,10,0,0);
+		constraints.insets = new Insets(20, 10, 0, 0);
 		constraints.gridheight = 3;
 		grid.add(player1Chat, constraints);
 
 		++constraints.gridx;
 		constraints.gridheight = 1;
-		constraints.insets = new Insets(20,0,0,0);
+		constraints.insets = new Insets(20, 0, 0, 0);
 		constraints.gridwidth = 1;
 		grid.add(playerPanel, constraints);
 
 		++constraints.gridx;
 		constraints.gridheight = 3;
-		constraints.insets = new Insets(20,0,0,10);
+		constraints.insets = new Insets(20, 0, 0, 10);
 		grid.add(player2Chat, constraints);
 
 		constraints.gridx = 1;
-		constraints.insets = new Insets(0,0,0,0);
+		constraints.insets = new Insets(0, 0, 0, 0);
 		constraints.gridheight = 1;
 		++constraints.gridy;
-		
-		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
+
+		grid.add(getEmptyLabel(new Dimension(boardWidth + 20, 10)), constraints);
 
 		JPanel scorePanel = new JPanel(new GridLayout(2, 2));
-		scorePanel.setPreferredSize(new Dimension(boardWidth+20, dist));
+		scorePanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
 		scorePanel.add(new JLabel("<html><font color='red'>Score:", SwingConstants.CENTER));
 		scorePanel.add(new JLabel("<html><font color='blue'>Score:", SwingConstants.CENTER));
 		redScoreLabel = new JLabel("0", SwingConstants.CENTER);
@@ -329,7 +343,7 @@ public class GamePlay {
 		grid.add(scorePanel, constraints);
 
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(boardWidth + 20, 10)), constraints);
 
 		hEdge = new JLabel[n - 1][n];
 		isSetHEdge = new boolean[n - 1][n];
@@ -372,20 +386,20 @@ public class GamePlay {
 		statusLabel.setForeground(Color.RED);
 		statusLabel.setOpaque(true);
 		statusLabel.setBackground(Color.WHITE);
-		statusLabel.setPreferredSize(new Dimension(boardWidth+20, dist));
+		statusLabel.setPreferredSize(new Dimension(boardWidth + 20, dist));
 		++constraints.gridy;
 		grid.add(statusLabel, constraints);
 
 		++constraints.gridy;
-		grid.add(getEmptyLabel(new Dimension(boardWidth+20, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(boardWidth + 20, 10)), constraints);
 
-		JButton goBackButton = new JButton("Go Back to Main Menu");
-		goBackButton.setPreferredSize(new Dimension(boardWidth, dist));
-		goBackButton.addActionListener(backListener);
+		JButton surrenderButton = new JButton("Surrender");
+		surrenderButton.setPreferredSize(new Dimension(boardWidth, dist));
+		surrenderButton.addActionListener(backListener);
 		++constraints.gridy;
-		grid.add(goBackButton, constraints);
+		grid.add(surrenderButton, constraints);
 
-		constraints.insets = new Insets(15,0,0,0);
+		constraints.insets = new Insets(15, 0, 0, 0);
 
 		++constraints.gridy;
 		JPanel helpPanel = new JPanel(new GridLayout(1, 2));
@@ -401,9 +415,21 @@ public class GamePlay {
 		questionButton.addActionListener(questionListener);
 
 		helpPanel.add(questionButton);
-		constraints.insets = new Insets(15,0,15,0);
+		constraints.insets = new Insets(0, 0, 0, 0);
 		grid.add(helpPanel, constraints);
 		++constraints.gridy;
+
+		this.chatTextField = new JTextField();
+		this.chatTextField.setPreferredSize(new Dimension(boardWidth, dist));
+
+		this.chatTextField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {	
+				currentController.requestMessage(chatTextField.getText());
+			}
+		});
+
+		constraints.insets = new Insets(15, 0, 15, 0);
+		grid.add(chatTextField, constraints);
 
 		frame.getContentPane().removeAll();
 		frame.revalidate();
@@ -427,8 +453,36 @@ public class GamePlay {
 		frame.dispose();
 	}
 
+	public void handleMessage(String message, int seat) {
+		if(seat == this.mySeat) {
+			this.chatTextField.setText("");
+		}
+		if (seat == 0) {
+			this.player1Chat.setText(message);
+			this.player1Chat.setOpaque(true);
+			this.player1Timer.restart();
+
+		} else if (seat == 1) {
+			this.player2Chat.setText(message);
+			this.player2Chat.setOpaque(true);
+			this.player2Timer.restart();
+		}
+	}
+
+	private void closeMessage(int seat) {
+		if (seat == 0) {
+			this.player1Chat.setText("");
+			this.player1Chat.setOpaque(false);
+		} else if (seat == 1) {
+			this.player2Chat.setText("");
+			this.player2Chat.setOpaque(false);
+		}
+	}
+
 	public static void main(String args[]) {
-		new GamePlay(4, null, 0, "ngu", "ngoc");
+		GamePlay test = new GamePlay(4, null, 0, "ngu", "ngoc");
+		test.handleMessage("hello", 0);
+		test.handleMessage("he2", 1);
 	}
 
 }
