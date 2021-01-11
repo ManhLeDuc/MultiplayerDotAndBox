@@ -13,6 +13,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -149,15 +151,20 @@ public class GamePlay {
 				turn = ColorTeam.BLUE;
 				if (turn == mySeat) {
 					this.mouseEnabled = true;
+					statusLabel.setText("Your Turn...");
 				}
-				statusLabel.setText("Player-2's Turn...");
+				else 
+					statusLabel.setText("Opponent's Turn...");
+				
 				statusLabel.setForeground(Color.BLUE);
 			} else {
 				turn = ColorTeam.RED;
 				if (turn == mySeat) {
 					this.mouseEnabled = true;
+					statusLabel.setText("Your Turn...");
 				}
-				statusLabel.setText("Player-1's Turn...");
+				else 
+					statusLabel.setText("Opponent's Turn...");
 				statusLabel.setForeground(Color.RED);
 			}
 		} else {
@@ -300,11 +307,18 @@ public class GamePlay {
 			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
 		else
 			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
-
-		playerPanel.add(new JLabel("<html><font color='red'>Player-1:", SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='blue'>Player-2:", SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='red'>" + player1, SwingConstants.CENTER));
-		playerPanel.add(new JLabel("<html><font color='blue'>" + player2, SwingConstants.CENTER));
+		if(mySeat == 0) {
+			playerPanel.add(new JLabel("<html><font color='red'>You:", SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='blue'>Opponent:", SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='red'>" + player1, SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='blue'>" + player2, SwingConstants.CENTER));
+		}else if(mySeat == 1) {
+			playerPanel.add(new JLabel("<html><font color='red'>Opponent:", SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='blue'>You:", SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='red'>" + player1, SwingConstants.CENTER));
+			playerPanel.add(new JLabel("<html><font color='blue'>" + player2, SwingConstants.CENTER));
+		}
+			
 
 		++constraints.gridy;
 		constraints.insets = new Insets(20, 10, 0, 0);
@@ -381,8 +395,10 @@ public class GamePlay {
 
 		++constraints.gridy;
 		grid.add(getEmptyLabel(new Dimension(0, 10)), constraints);
-
-		statusLabel = new JLabel("Player-1's Turn...", SwingConstants.CENTER);
+		if(mySeat == 0)
+			statusLabel = new JLabel("Your Turn...", SwingConstants.CENTER);
+		else 
+			statusLabel = new JLabel("Opponent's Turn...", SwingConstants.CENTER);
 		statusLabel.setForeground(Color.RED);
 		statusLabel.setOpaque(true);
 		statusLabel.setBackground(Color.WHITE);
@@ -439,6 +455,16 @@ public class GamePlay {
 		frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+            public void windowClosing(WindowEvent e) {
+				currentController.requestGameEnd();
+            }
+		});
+		
+		frame.setResizable(false);
 
 		if (mySeat == turn) {
 			mouseEnabled = true;

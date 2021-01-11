@@ -10,13 +10,17 @@ import java.awt.event.ActionListener;
 //import java.io.DataOutputStream;
 //import java.io.IOException;
 //import java.net.Socket;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 public class RoomListGUI extends JFrame {
@@ -28,7 +32,9 @@ public class RoomListGUI extends JFrame {
 	private JPanel contentPane;
 	private JButton btnLogOut;
 	private JButton btnCreateRoom;
-	private JLabel lblUserId;
+	private JButton btnTopRank;
+	private JLabel lblUserName;
+	private JLabel lblUserElo;
 	private Controller controller;
 	
 	private RoomInfo[] roomInfoList = new RoomInfo[50];
@@ -42,7 +48,7 @@ public class RoomListGUI extends JFrame {
 		setResizable(false);
 		this.controller = controller;
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(100, 100, 919, 679);
 		contentPane = new JPanel();
 		contentPane.setBackground(new Color(0, 139, 139));
@@ -59,15 +65,25 @@ public class RoomListGUI extends JFrame {
 		panel_1.add(panel_4);
 		panel_4.setLayout(null);
 		
-		JLabel lblUserName = new JLabel("UserID: ");
-		lblUserName.setFont(new Font("Arial", Font.ITALIC, 18));
-		lblUserName.setBounds(15, 36, 69, 20);
+		JLabel lblName = new JLabel("UserName: ");
+		lblName.setFont(new Font("Arial", Font.ITALIC, 18));
+		lblName.setBounds(10, 36, 115, 20);
+		panel_4.add(lblName);
+		
+		lblUserName = new JLabel("");
+		lblUserName.setFont(new Font("Arial", Font.BOLD, 18));
+		lblUserName.setBounds(10, 66, 69, 20);
 		panel_4.add(lblUserName);
 		
-		lblUserId = new JLabel("");
-		lblUserId.setFont(new Font("Arial", Font.BOLD, 18));
-		lblUserId.setBounds(15, 83, 69, 20);
-		panel_4.add(lblUserId);
+		JLabel lblElo = new JLabel("ELO: ");
+		lblElo.setFont(new Font("Arial", Font.ITALIC, 14));
+		lblElo.setBounds(10, 99, 115, 20);
+		panel_4.add(lblElo);
+		
+		lblUserElo = new JLabel("");
+		lblUserElo.setFont(new Font("Arial", Font.BOLD, 14));
+		lblUserElo.setBounds(10, 126, 69, 20);
+		panel_4.add(lblUserElo);
 		
 		JPanel panel_3 = new JPanel();
 		panel_3.setBackground(new Color(64, 224, 208));
@@ -77,6 +93,15 @@ public class RoomListGUI extends JFrame {
 		btnCreateRoom.addActionListener(createRoomListener);
 		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		panel_3.add(btnCreateRoom);
+		
+		btnTopRank = new JButton("Top Rank");
+		btnTopRank.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent actionEvent) {
+				controller.requestTopRank();
+			}});
+		panel_3.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		panel_3.add(btnTopRank);
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setBackground(new Color(32, 178, 170));
@@ -100,16 +125,25 @@ public class RoomListGUI extends JFrame {
 		
 		JScrollPane scrollPane = new JScrollPane(listPanel);
 		contentPane.add(scrollPane, BorderLayout.CENTER);
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+            public void windowClosing(WindowEvent e) {
+				controller.requestDisconnect();
+            }
+		});
+		
+		this.setResizable(false);
 	
 		
 	}
 	
 	public void setUserName(String userName) {
-		lblUserId.setText(userName);
+		lblUserName.setText(userName);
 	}
 	
 	public void setMmr(int mmr) {
-		
+		lblUserElo.setText(String.valueOf(mmr));
 	}
 	
 	public void roomPlayer(int roomId, int seat, int playerId, String userName) {
@@ -159,6 +193,33 @@ public class RoomListGUI extends JFrame {
 			controller.requestDisconnect();
 		}
 	};
+	
+	public void reset() {
+		for(int i=0; i<this.roomInfoList.length; i++) {
+			this.roomInfoList[i].reset();
+		}
+	}
+	
+	public void showTopRank(String[] userNames, int[] mmrs) {
+		String results = new String();
+		for(int i =0; i<userNames.length; i++) {
+			results += userNames[i];
+			results += " - ";
+			results += String.valueOf(mmrs[i]);
+			results += "\n";
+			
+		}
+		JTextArea msg = new JTextArea(
+				results,
+				20, 20);
+		msg.setLineWrap(true);
+		msg.setWrapStyleWord(true);
+		msg.setEditable(false);
+
+		JScrollPane scrollPane = new JScrollPane(msg);
+
+		JOptionPane.showMessageDialog(this, scrollPane, "Top Players!!!", JOptionPane.INFORMATION_MESSAGE);
+	}
 	
 
 }

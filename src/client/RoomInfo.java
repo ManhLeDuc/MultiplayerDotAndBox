@@ -124,5 +124,10 @@ public class RoomInfo extends JPanel {
 			currentRoomListGUI.joinRoom(roomId);
 		}
 	};
+	
+	public void reset() {
+		this.removePlayer(0);
+		this.removePlayer(1);
+	}
 
 }

@@ -24,7 +24,7 @@ public class Client implements Runnable {
 	public boolean isConnected() {
 		return connected;
 	}
-
+	//Login
 	Client(String u, String p, Socket s, DataInputStream i, DataOutputStream o, Controller controller) {
 		this.controller = controller;
 		userName = u;
@@ -34,6 +34,15 @@ public class Client implements Runnable {
 		out = o;
 		(listener = new Thread(this)).start();
 		output(Packet.CPLogin(userName, passWord));
+	}
+	
+	//Register
+	Client(Socket s, DataInputStream i, DataOutputStream o, Controller controller) {
+		this.controller = controller;
+		sock = s;
+		in = i;
+		out = o;
+		(listener = new Thread(this)).start();
 	}
 
 	void output(byte[] p) {
@@ -87,6 +96,12 @@ public class Client implements Runnable {
 					case Packet.SP_GET_MMR:
 						hdGetMmr();
 						break;
+					case Packet.SP_REGISTER:
+						hdRegister();
+						break;
+					case Packet.SP_TOP_RANK:
+						hdTopRank();
+						break;
 					}
 					
 				}
@@ -121,6 +136,7 @@ public class Client implements Runnable {
 		myID = in.readInt();
 		myName = in.readUTF();
 		myMmr = in.readInt();
+		printPacket(Packet.SPYouAre(myID, myName, myMmr));
 		controller.loginSuccess(myID, myName, myMmr);
 	}
 	
@@ -185,6 +201,24 @@ public class Client implements Runnable {
 		printPacket(Packet.SPGetMmr(mmr));
 		this.myMmr = mmr;
 		controller.processMmr(mmr);
+	}
+	
+	void hdRegister() throws IOException {
+		boolean success = in.readBoolean();
+		printPacket(Packet.SPRegister(success));
+		controller.handleRegister(success);
+		this.disconnect();
+	}
+	
+	void hdTopRank() throws IOException {
+		int numb = in.readInt();
+		String[] userNames = new String[numb];
+		int[] mmrs = new int[numb];
+		for(int i =0; i<numb; i++) {
+			userNames[i] = in.readUTF();
+			mmrs[i] = in.readInt();
+		}
+		controller.handleTopRank(userNames, mmrs);
 	}
 	
 	private void printPacket(byte[] p) {

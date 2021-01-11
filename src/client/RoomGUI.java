@@ -1,9 +1,13 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -12,6 +16,9 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 public class RoomGUI extends JFrame {
@@ -23,6 +30,13 @@ public class RoomGUI extends JFrame {
 	private JPanel contentPane;
 	private JLabel lblPlayer1Id;
 	private JLabel lblPlayer2Id;
+	private JLabel lblPlayer1Chat;
+	private JLabel lblPlayer2Chat;
+	
+	private JTextField chatTextField;
+	private Timer player1Timer = null;
+	private Timer player2Timer = null;
+	
 	private JButton btnStartGame;
 	private Controller controller;
 	private JRadioButton[] sizeButton;
@@ -57,19 +71,22 @@ public class RoomGUI extends JFrame {
 		for (int i = 0; i < 8; i++) {
 			String size = String.valueOf(i + 3);
 			sizeButton[i] = new JRadioButton(size + " x " + size);
+			sizeButton[i].setFont(new Font("Arial", Font.BOLD, 16));
 			sizeButton[i].setPreferredSize(new Dimension(100,50));
 			sizeGroup.add(sizeButton[i]);
 		}
 		sizeGroup.clearSelection();
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 715, 419);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setBounds(100, 100, 715, 521);
 		contentPane = new JPanel();
+		contentPane.setBackground(Color.YELLOW);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		JPanel panel = new JPanel();
+		panel.setBackground(Color.PINK);
 		panel.setBounds(5, 5, 113, 42);
 		contentPane.add(panel);
 		
@@ -77,35 +94,85 @@ public class RoomGUI extends JFrame {
 		panel.add(lblPlayer1Id);
 		
 		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(579, 5, 113, 42);
+		panel_1.setBackground(Color.PINK);
+		panel_1.setBounds(588, 5, 113, 42);
 		contentPane.add(panel_1);
 		
 		lblPlayer2Id = new JLabel("No one is here");
 		panel_1.add(lblPlayer2Id);
 		
 		btnStartGame = new JButton("Start Game");
+		btnStartGame.setBackground(new Color(255, 99, 71));
 		btnStartGame.setBounds(130, 320, 192, 29);
 		btnStartGame.addActionListener(startGameListener);
 		contentPane.add(btnStartGame);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(130, 109, 451, 200);
+		panel_2.setBackground(new Color(218, 112, 214));
+		panel_2.setBounds(130,107, 451, 203);
 		contentPane.add(panel_2);
 
 		
 		JPanel sizePanel = new JPanel();
-		sizePanel.setPreferredSize(new Dimension(400, 150));
-		for (int i = 0; i < 8; i++)
+		sizePanel.setBackground(new Color(218, 112, 214));
+		sizePanel.setPreferredSize(new Dimension(400,180));
+		for (int i = 0; i < 8; i++) {
+			sizeButton[i].setBackground(new Color(218, 112, 214));		
+			sizeButton[i].setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+			sizeButton[i].setForeground(Color.WHITE);
 			sizePanel.add(sizeButton[i]);
+		}
 		
 		panel_2.add(sizePanel);
 		sizePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		JButton btnQuitRoom = new JButton("Quit Room");
+		btnQuitRoom.setBackground(new Color(255, 99, 71));
 		btnQuitRoom.setBounds(389, 320, 192, 29);
-		contentPane.add(btnQuitRoom);		
+		contentPane.add(btnQuitRoom);	
 		btnQuitRoom.addActionListener(quitRoomListener);
 		
+		lblPlayer1Chat = new JLabel("", SwingConstants.CENTER);
+		lblPlayer1Chat.setBackground(Color.WHITE);
+		lblPlayer1Chat.setBounds(128, 5, 127, 92);
+		contentPane.add(lblPlayer1Chat);
+		
+		lblPlayer2Chat = new JLabel("", SwingConstants.CENTER);
+		lblPlayer2Chat.setBackground(Color.WHITE);
+		lblPlayer2Chat.setBounds(451, 5, 127, 92);
+		contentPane.add(lblPlayer2Chat);
+		
+		this.player1Timer = new Timer(5000, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				closeMessage(0);
+			}
+		});
+
+		this.player2Timer = new Timer(5000, new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				closeMessage(1);
+			}
+		});
+		
+		this.chatTextField = new JTextField();
+		chatTextField.setBounds(130, 377, 451, 42);
+		contentPane.add(chatTextField);
+
+		this.chatTextField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {	
+				controller.requestMessage(chatTextField.getText());
+			}
+		});
+		
+		
+		this.addWindowListener(new WindowAdapter() {
+			@Override
+            public void windowClosing(WindowEvent e) {
+				controller.requestQuitRoom();
+            }
+		});
+		
+		this.setResizable(false);
 		
 	}
 	
@@ -182,7 +249,29 @@ public class RoomGUI extends JFrame {
 	}
 	
 	public void handleMessage(String message, int seat) {
-		
+		if(seat == this.mySeat) {
+			this.chatTextField.setText("");
+		}
+		if (seat == 0) {
+			this.lblPlayer1Chat.setText(message);
+			this.lblPlayer1Chat.setOpaque(true);
+			this.player1Timer.restart();
+
+		} else if (seat == 1) {
+			this.lblPlayer2Chat.setText(message);
+			this.lblPlayer2Chat.setOpaque(true);
+			this.player2Timer.restart();
+		}
+	}
+
+	private void closeMessage(int seat) {
+		if (seat == 0) {
+			this.lblPlayer1Chat.setText("");
+			this.lblPlayer1Chat.setOpaque(false);
+		} else if (seat == 1) {
+			this.lblPlayer2Chat.setText("");
+			this.lblPlayer2Chat.setOpaque(false);
+		}
 	}
 	
 	public void winnerMessage(int seat) {

@@ -16,6 +16,7 @@ public class Controller {
 	private RoomListGUI roomListGUI;
 	private RoomGUI roomGUI;
 	private GamePlay gamePlayGUI = null;
+	private RegisterGUI registerGUI = null;
 	private int currentRoomId = -1;
 	
 
@@ -40,10 +41,20 @@ public class Controller {
 	}
 
 	public void disconnect() {
-		loginGUI.setVisible(true);
-		roomListGUI.setVisible(false);
-		roomGUI.setVisible(false);
-		currentClient = null;
+		if(this.registerGUI==null) {
+			loginGUI.setVisible(true);
+			roomListGUI.reset();
+			roomListGUI.setVisible(false);
+			roomGUI.setVisible(false);
+			currentClient = null;
+		}
+		else {
+			roomListGUI.reset();
+			roomListGUI.setVisible(false);
+			roomGUI.setVisible(false);
+			currentClient = null;
+		}
+		
 	}
 	
 	public void requestDisconnect() {
@@ -63,6 +74,10 @@ public class Controller {
 
 	public void networkFail() {
 		JOptionPane.showMessageDialog(null, "Network Fail", "Error!!!", JOptionPane.ERROR_MESSAGE);
+		if(this.registerGUI!=null) {
+			this.registerGUI.dispose();
+			this.registerGUI = null;
+		}
 		currentClient = null;
 		loginGUI.setVisible(true);
 		roomListGUI.setVisible(false);
@@ -152,6 +167,12 @@ public class Controller {
 		}
 	}
 	
+	public void registerClose() {
+		this.registerGUI.dispose();
+		this.registerGUI = null;
+		this.loginGUI.setVisible(true);
+	}
+	
 	public void requestProcessMove(int x, int y, boolean isHorizontal) {
 		currentClient.output(Packet.CPGameMove(x, y, isHorizontal));
 		
@@ -181,6 +202,45 @@ public class Controller {
 			this.roomGUI.mmrMessage(mmr);
 		}
 		
+	}
+	
+	public void openRegisterGUI() {
+		this.registerGUI = new RegisterGUI(this);
+		this.loginGUI.setVisible(false);
+		this.registerGUI.setVisible(true);
+	}
+	
+	public void registerController(String username, String password) {
+		try {
+			Socket s = new Socket("localhost", 5656);
+			DataInputStream i = new DataInputStream(s.getInputStream());
+			DataOutputStream o = new DataOutputStream(s.getOutputStream());
+			currentClient = new Client(s, i, o, this);
+			this.currentClient.output(Packet.CPRegister(username, password));
+		} catch (IOException e) {
+			networkFail();
+		}
+		
+	}
+	
+	public void handleRegister(boolean success) {
+		if(this.registerGUI!=null) {
+			if(success) {
+				this.registerGUI.dispose();
+				this.registerGUI = null;
+				this.loginGUI.setVisible(true);
+			}else {
+				this.registerGUI.registerFail();
+			}
+		}
+	}
+	
+	public void requestTopRank() {
+		this.currentClient.output(Packet.CPTopRank());
+	}
+	
+	public void handleTopRank(String[] userNames, int[] mmrs) {
+		roomListGUI.showTopRank(userNames, mmrs);
 	}
 
 }

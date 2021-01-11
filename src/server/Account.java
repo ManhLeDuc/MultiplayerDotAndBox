@@ -4,8 +4,13 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.net.URL;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class Account {
 	public static HashMap<String, Account> accounts = new HashMap<String, Account>();
@@ -44,6 +49,7 @@ public class Account {
 
 	public void setMmr(int mmr) {
 		this.mmr = mmr;
+		saveAccounts();
 	}
 
 	public Account(String userName, String passWord, int mmr) {
@@ -54,10 +60,9 @@ public class Account {
 		this.login = false;
 	}
 
-	public static void initAccounts() {
+	public synchronized static void initAccounts() {
 		try {
-			URL path = Account.class.getResource("accounts.txt");
-			File f = new File(path.getFile());
+			File f = new File("accounts.txt");
 			String tempPassWord;
 			String tempUserName;
 			int tempMmr;
@@ -83,43 +88,91 @@ public class Account {
 	}
 
 	public synchronized static void saveAccounts() {
-		try {
-			URL path = Account.class.getResource("accounts.txt");
-			File f = new File(path.getFile());
-			FileWriter csvWriter = new FileWriter(f);
-			csvWriter.append(String.valueOf(accounts.size()));
-			for (Account tempAccount : accounts.values()) {
-				csvWriter.append(tempAccount.getUserName());
-				csvWriter.append(tempAccount.getPassWord());
-				csvWriter.append(String.valueOf(tempAccount.getMmr()));
+		synchronized (accounts) {
+			try {
+				//URL path = Account.class.getResource("accounts.txt");
+				File f = new File("accounts.txt");
+				FileWriter csvWriter = new FileWriter(f);
+				csvWriter.append(String.valueOf(accounts.size()));
+				csvWriter.append('\n');
+				for (Account tempAccount : accounts.values()) {
+					csvWriter.append(tempAccount.getUserName());
+					csvWriter.append('\n');
+					csvWriter.append(tempAccount.getPassWord());
+					csvWriter.append('\n');
+					csvWriter.append(String.valueOf(tempAccount.getMmr()));
+					csvWriter.append('\n');
+				}
+				csvWriter.flush();
+				csvWriter.close();
+				return;
+			} catch (Exception e) {
+				System.out.println(e);
+				return;
 			}
-			csvWriter.flush();
-			csvWriter.close();
-			return;
-		} catch (Exception e) {
-			return;
 		}
+
 	}
 
 	public synchronized static Account login(String userName, String passWord) {
-		Account tempAccount = accounts.get(userName);
-		if(tempAccount == null)
-			return null;
-		else if (tempAccount.getPassWord().equals(passWord) && !tempAccount.isLogin()) {
-			tempAccount.setLogin(true);
-			return tempAccount;
-		} else
-			return null;
+		synchronized (accounts) {
+			Account tempAccount = accounts.get(userName);
+			if (tempAccount == null)
+				return null;
+			else if (tempAccount.getPassWord().equals(passWord) && !tempAccount.isLogin()) {
+				tempAccount.setLogin(true);
+				return tempAccount;
+			} else
+				return null;
+		}
 	}
 
 	public synchronized static void logout(String userName) {
-		accounts.get(userName).setLogin(false);
+		synchronized (accounts) {
+			accounts.get(userName).setLogin(false);
+		}
+
 	}
 
-	public synchronized static void resiger(String userName, String passWord) {
-		if (accounts.get(userName) == null) {
-			Account tempAccount = new Account(userName, passWord, 0);
-			accounts.put(userName, tempAccount);
+	public synchronized static boolean resiger(String userName, String passWord) {
+		synchronized (accounts) {
+			if(userName.isEmpty()||passWord.isEmpty()) {
+				return false;
+			}
+			if (accounts.get(userName) == null) {
+				Account tempAccount = new Account(userName, passWord, 0);
+				accounts.put(userName, tempAccount);
+				saveAccounts();
+				return true;
+			} else
+				return false;
 		}
 	}
+	
+	public synchronized static HashMap<String, Account> topAccounts() {
+		return sortByValue(accounts);
+	}
+	
+	private static HashMap<String, Account> sortByValue(HashMap<String, Account> hm) 
+    { 
+        // Create a list from elements of HashMap 
+        List<Map.Entry<String, Account> > list = 
+               new LinkedList<Map.Entry<String, Account> >(hm.entrySet()); 
+  
+        // Sort the list 
+        Collections.sort(list, new Comparator<Map.Entry<String, Account> >() { 
+            public int compare(Map.Entry<String, Account> o1,  
+                               Map.Entry<String, Account> o2) 
+            { 
+                return -(Integer.compare(o1.getValue().getMmr(), o2.getValue().getMmr())); 
+            } 
+        }); 
+          
+        // put data from sorted list to hashmap  
+        HashMap<String, Account> temp = new LinkedHashMap<String, Account>(); 
+        for (Map.Entry<String, Account> aa : list) { 
+            temp.put(aa.getKey(), aa.getValue()); 
+        } 
+        return temp; 
+    } 
 }

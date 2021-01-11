@@ -4,6 +4,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 import packet.Packet;
 
@@ -117,6 +119,12 @@ class Player extends Thread {
 						break;
 					case Packet.CP_GAME_MOVE:
 						hdGameMove();
+						break;
+					case Packet.CP_REGISTER:
+						hdRegister();
+						break;
+					case Packet.CP_TOP_RANK:
+						hdTopRank();
 						break;
 					// call other packet handlers
 					}
@@ -239,6 +247,36 @@ class Player extends Thread {
 
 			}
 		}
+	}
+	
+	void hdRegister() throws IOException {
+		String username = in.readUTF();
+		String password = in.readUTF();
+		printPacket(Packet.CPRegister(username, password));
+		output(Packet.SPRegister(Account.resiger(username, password)));
+	}
+	
+	void hdTopRank() throws IOException {
+		printPacket(Packet.CPTopRank());
+		HashMap<String, Account> results = Account.topAccounts();
+		int size = results.size();
+		if(size > 5) {
+			size =5;
+		}
+		String[] userNames = new String[size];
+		int[] mmrs = new int[size];
+		int i = 0;
+		for (Map.Entry<String, Account> en : results.entrySet()) { 
+            if(i==size) {
+            	break;
+            }
+            else {
+            	userNames[i] = en.getKey();
+            	mmrs[i] = en.getValue().getMmr();
+            	i++;
+            }
+        } 
+		output(Packet.SPTopRank(userNames, mmrs));
 	}
 
 	private void printPacket(byte[] p) {
