@@ -98,6 +98,18 @@ public class Box {
 	
 	public int setvEdge(int x, int y, int color) {
 		
+		if(checkBox() == true)
+		{
+			if(this.trangthai == ColorTeam.BLANK) {
+				this.trangthai = color;
+				return 2;
+			}
+			else {
+				return 0;
+			}
+				
+		}
+		
 		if(vLEdge.updateColor(x, y) == false && vREdge.updateColor(x, y) == false)
 			return 0;
 		if(checkBox() == true)

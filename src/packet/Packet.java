@@ -33,7 +33,8 @@ public class Packet extends DataOutputStream {
 	public static final byte SP_QUIT = 8;
 	public static final byte SP_GAME_MOVE = 9;
 	public static final byte SP_GAME_START = 10;
-	public static final byte SP_GAME_WIN = 11;	
+	public static final byte SP_GAME_WIN = 11;
+	public static final byte SP_GET_MMR = 12;
 
 	// Client packets tag
 	public static final byte CP_LOGIN = 100;
@@ -45,6 +46,7 @@ public class Packet extends DataOutputStream {
 	public static final byte CP_GAME_START = 94;
 	public static final byte CP_GAME_MOVE = 93;
 	public static final byte CP_GAME_SURRENDER = 92;
+	public static final byte CP_GET_MMR = 91;
 
 	public static byte[] SPErrorPacket(String message) {
 		try {
@@ -57,12 +59,13 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 
-	public static byte[] SPYouAre(int id, String username) {
+	public static byte[] SPYouAre(int id, String username, int mmr) {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(SP_YOU_ARE); // write tag first
 			p.writeInt(id); // write fields
 			p.writeUTF(username);
+			p.writeInt(mmr);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
@@ -74,18 +77,6 @@ public class Packet extends DataOutputStream {
 			Packet p = New(10); // estimated size
 			p.writeByte(SP_LEAVE); // write tag first
 			p.writeInt(id); // write fields
-			return p.buf(); // return the buffer
-		} catch (IOException e) {
-			return null;
-		} // shouldn't happen
-	}
-	
-	public static byte[] CPLogin(String userName, String passWord) {
-		try {
-			Packet p = New(10); // estimated size
-			p.writeByte(CP_LOGIN); // write tag first
-			p.writeUTF(userName);
-			p.writeUTF(passWord);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;
@@ -115,26 +106,7 @@ public class Packet extends DataOutputStream {
 		} // shouldn't happen
 	}
 	
-	public static byte[] CPMessage(String message) {
-		try {
-			Packet p = New(20); // estimated size
-			p.writeByte(CP_MESSAGE); // write tag first
-			p.writeUTF(message);
-			return p.buf(); // return the buffer
-		} catch (IOException e) {
-			return null;
-		} // shouldn't happen
-	}
 	
-	public static byte[] CPQuit() {
-		try {
-			Packet p = New(10); // estimated size
-			p.writeByte(CP_QUIT); // write tag first
-			return p.buf(); // return the buffer
-		} catch (IOException e) {
-			return null;
-		} // shouldn't happen
-	}
 	
 	public static byte[] SPRoomPlayer(int roomId, int seat, int playerId, String userName) {
 		try {
@@ -195,7 +167,51 @@ public class Packet extends DataOutputStream {
 		} catch (IOException e) {
 			return null;
 		} // shouldn't happen
-	}	
+	}
+	
+	public static byte[] SPGetMmr(int mmr) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(SP_GET_MMR); // write tag first
+			p.writeInt(mmr);		
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPLogin(String userName, String passWord) {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_LOGIN); // write tag first
+			p.writeUTF(userName);
+			p.writeUTF(passWord);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPMessage(String message) {
+		try {
+			Packet p = New(20); // estimated size
+			p.writeByte(CP_MESSAGE); // write tag first
+			p.writeUTF(message);
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPQuit() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_QUIT); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
 	
 	public static byte[] CPGameStart(int boardSize) {
 		try {
@@ -256,6 +272,16 @@ public class Packet extends DataOutputStream {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(CP_ROOM_LEAVE); // write tag first
+			return p.buf(); // return the buffer
+		} catch (IOException e) {
+			return null;
+		} // shouldn't happen
+	}
+	
+	public static byte[] CPGetMmr() {
+		try {
+			Packet p = New(10); // estimated size
+			p.writeByte(CP_GET_MMR); // write tag first
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;

@@ -88,7 +88,7 @@ public class Room {
 	public synchronized void update(Player him) {
 		for (int i = 0; i < players.length; i++) {
 			if (players[i] != null)
-				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id, him.getAccount().getUserName()));
+				him.output(Packet.SPRoomPlayer(id, i, this.players[i].id, players[i].getAccount().getUserName()));
 		}
 	}
 
@@ -121,6 +121,7 @@ public class Room {
 		for (int i = 0; i < players.length; i++) {
 			if (players[i] != null) {
 				players[i].output(Packet.SPGameWin(seat));
+				players[i].output(Packet.SPGetMmr(players[i].getAccount().getMmr()));
 			}
 		}
 		this.currentGame = null;

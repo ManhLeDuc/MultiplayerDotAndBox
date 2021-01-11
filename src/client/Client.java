@@ -18,6 +18,7 @@ public class Client implements Runnable {
 	Controller controller;
 	int myID = -1;
 	String myName;
+	int myMmr = -1;
 	private boolean connected = true;
 
 	public boolean isConnected() {
@@ -83,6 +84,9 @@ public class Client implements Runnable {
 					case Packet.SP_GAME_MOVE:
 						hdGameMove();
 						break;
+					case Packet.SP_GET_MMR:
+						hdGetMmr();
+						break;
 					}
 					
 				}
@@ -114,10 +118,10 @@ public class Client implements Runnable {
 	}
 
 	void hdYouAre() throws IOException {
-
 		myID = in.readInt();
 		myName = in.readUTF();
-		controller.loginSuccess(myID, myName);
+		myMmr = in.readInt();
+		controller.loginSuccess(myID, myName, myMmr);
 	}
 	
 	void hdLeave() throws IOException {
@@ -138,9 +142,6 @@ public class Client implements Runnable {
 			output(Packet.CPQuit());
 			disconnect();
 			controller.loginFail();
-		} else {
-			myID = tempId;
-			controller.loginSuccess(myID, myName);
 		}
 	}
 	
@@ -177,6 +178,13 @@ public class Client implements Runnable {
 		printPacket(Packet.SPGameMove(x, y, isHorizontal, seat));
 		
 		controller.processMove(x, y, isHorizontal, seat);
+	}
+	
+	void hdGetMmr() throws IOException {
+		int mmr = in.readInt();
+		printPacket(Packet.SPGetMmr(mmr));
+		this.myMmr = mmr;
+		controller.processMmr(mmr);
 	}
 	
 	private void printPacket(byte[] p) {

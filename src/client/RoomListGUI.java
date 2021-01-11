@@ -31,8 +31,6 @@ public class RoomListGUI extends JFrame {
 	private JLabel lblUserId;
 	private Controller controller;
 	
-	
-
 	private RoomInfo[] roomInfoList = new RoomInfo[50];
 	
 	
@@ -108,6 +106,10 @@ public class RoomListGUI extends JFrame {
 	
 	public void setUserName(String userName) {
 		lblUserId.setText(userName);
+	}
+	
+	public void setMmr(int mmr) {
+		
 	}
 	
 	public void roomPlayer(int roomId, int seat, int playerId, String userName) {

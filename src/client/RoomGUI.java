@@ -9,6 +9,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.border.EmptyBorder;
@@ -76,7 +77,7 @@ public class RoomGUI extends JFrame {
 		panel.add(lblPlayer1Id);
 		
 		JPanel panel_1 = new JPanel();
-		panel_1.setBounds(578, 5, 113, 42);
+		panel_1.setBounds(579, 5, 113, 42);
 		contentPane.add(panel_1);
 		
 		lblPlayer2Id = new JLabel("No one is here");
@@ -88,7 +89,7 @@ public class RoomGUI extends JFrame {
 		contentPane.add(btnStartGame);
 		
 		JPanel panel_2 = new JPanel();
-		panel_2.setBounds(130, 102, 451, 200);
+		panel_2.setBounds(130, 109, 451, 200);
 		contentPane.add(panel_2);
 
 		
@@ -102,9 +103,9 @@ public class RoomGUI extends JFrame {
 		
 		JButton btnQuitRoom = new JButton("Quit Room");
 		btnQuitRoom.setBounds(389, 320, 192, 29);
-		
+		contentPane.add(btnQuitRoom);		
 		btnQuitRoom.addActionListener(quitRoomListener);
-		contentPane.add(btnQuitRoom);
+		
 		
 	}
 	
@@ -183,5 +184,23 @@ public class RoomGUI extends JFrame {
 	public void handleMessage(String message, int seat) {
 		
 	}
-
+	
+	public void winnerMessage(int seat) {
+		if(mySeat == -1)
+			return;
+		if (seat == mySeat) {
+			JOptionPane.showMessageDialog(this, "You won", "Yahalo!!!", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else if (seat == -1) {
+			JOptionPane.showMessageDialog(this, "You tied", "????????", JOptionPane.INFORMATION_MESSAGE);
+		}
+		else {
+			JOptionPane.showMessageDialog(this, "You lost", "!!!!!!!!", JOptionPane.INFORMATION_MESSAGE);
+		}
+	}
+	
+	public void mmrMessage(int mmr) {
+		JOptionPane.showMessageDialog(this, String.valueOf(mmr), "New MMR!!!", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
 }

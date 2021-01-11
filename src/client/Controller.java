@@ -20,7 +20,11 @@ public class Controller {
 	
 
 	public int getMyId() {
-		return currentClient.myID;
+		return this.currentClient.myID;
+	}
+	
+	public int getMyMmr() {
+		return this.currentClient.myMmr;
 	}
 
 	public Controller() {
@@ -65,10 +69,11 @@ public class Controller {
 		roomGUI.setVisible(false);
 	}
 
-	public void loginSuccess(int id, String userName) {
+	public void loginSuccess(int id, String userName, int mmr) {
 		loginGUI.setVisible(false);
 		roomListGUI.setVisible(true);
 		roomListGUI.setUserName(userName);
+		roomListGUI.setMmr(mmr);
 	}
 
 	public void loginFail() {
@@ -129,6 +134,7 @@ public class Controller {
 		this.gamePlayGUI.destroy();
 		this.gamePlayGUI = null;
 		roomGUI.setVisible(true);
+		roomGUI.winnerMessage(seat);
 	}
 	
 	public void requestGameEnd() {
@@ -167,6 +173,14 @@ public class Controller {
 	
 	public void requestMessage(String message) {
 		this.currentClient.output(Packet.CPMessage(message));
+	}
+	
+	public void processMmr(int mmr) {
+		this.roomListGUI.setMmr(mmr);
+		if(this.roomGUI.getMySeat()!= -1) {
+			this.roomGUI.mmrMessage(mmr);
+		}
+		
 	}
 
 }
