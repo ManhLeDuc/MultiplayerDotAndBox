@@ -303,10 +303,7 @@ public class GamePlay {
 		});
 
 		JPanel playerPanel = new JPanel(new GridLayout(2, 2));
-		if (n > 3)
-			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
-		else
-			playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
+		playerPanel.setPreferredSize(new Dimension(boardWidth + 20, dist));
 		if(mySeat == 0) {
 			playerPanel.add(new JLabel("<html><font color='red'>You:", SwingConstants.CENTER));
 			playerPanel.add(new JLabel("<html><font color='blue'>Opponent:", SwingConstants.CENTER));
@@ -341,7 +338,7 @@ public class GamePlay {
 		constraints.gridheight = 1;
 		++constraints.gridy;
 
-		grid.add(getEmptyLabel(new Dimension(boardWidth + 20, 10)), constraints);
+		grid.add(getEmptyLabel(new Dimension(2*boardWidth, 10)), constraints);
 
 		JPanel scorePanel = new JPanel(new GridLayout(2, 2));
 		scorePanel.setPreferredSize(new Dimension(boardWidth + 20, dist));

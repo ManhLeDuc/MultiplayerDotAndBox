@@ -68,7 +68,7 @@ public class RoomGUI extends JFrame {
 
 		sizeButton = new JRadioButton[8];
 		sizeGroup = new ButtonGroup();
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 4; i++) {
 			String size = String.valueOf(i + 3);
 			sizeButton[i] = new JRadioButton(size + " x " + size);
 			sizeButton[i].setFont(new Font("Arial", Font.BOLD, 16));

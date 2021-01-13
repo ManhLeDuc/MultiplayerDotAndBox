@@ -220,6 +220,7 @@ public class Client implements Runnable {
 			userNames[i] = in.readUTF();
 			mmrs[i] = in.readInt();
 		}
+		printPacket(Packet.SPTopRank(userNames, mmrs));
 		controller.handleTopRank(userNames, mmrs);
 	}
 	

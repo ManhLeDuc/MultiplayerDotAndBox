@@ -242,7 +242,7 @@ class Player extends Thread {
 		if (this.room != null && this.seat!=-1) {
 			
 			try {
-				this.room.endGame(this.seat);
+				this.room.endGame((this.seat==0)?1:0);
 			} catch (Exception e) {
 
 			}
