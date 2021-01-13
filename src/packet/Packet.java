@@ -52,11 +52,16 @@ public class Packet extends DataOutputStream {
 	public static final byte CP_REGISTER = 90;
 	public static final byte CP_TOP_RANK = 89;
 
-	public static byte[] SPErrorPacket(String message) {
+	// Error Code
+	public static final byte ERROR_FULL_PLAYER = 0;
+	public static final byte ERROR_FULL_ROOM = 1;
+	public static final byte ERROR_FULL_SEAT = 2;
+	
+	public static byte[] SPErrorPacket(byte ErrorCode) {
 		try {
 			Packet p = New(10); // estimated size
 			p.writeByte(SP_ERROR_PACKET); // write tag first
-			p.writeUTF(message);
+			p.writeByte(ErrorCode);
 			return p.buf(); // return the buffer
 		} catch (IOException e) {
 			return null;

@@ -242,5 +242,19 @@ public class Controller {
 	public void handleTopRank(String[] userNames, int[] mmrs) {
 		roomListGUI.showTopRank(userNames, mmrs);
 	}
+	
+	public void handleError(byte errorCode) {
+		switch(errorCode) {
+		case Packet.ERROR_FULL_PLAYER:
+			this.roomGUI.errorMessage("Server is full");
+			break;
+		case Packet.ERROR_FULL_ROOM:
+			this.roomGUI.errorMessage("Server is full of rooms");
+			break;
+		case Packet.ERROR_FULL_SEAT:
+			this.roomGUI.errorMessage("This room is full");
+			break;
+		}
+	}
 
 }

@@ -1,5 +1,6 @@
 package server;
 
+import Exception.FullServerPlayerException;
 import packet.Packet;
 
 public class Room {
@@ -13,7 +14,7 @@ public class Room {
 		return players;
 	}
 
-	public Room() throws FullServerException {
+	public Room() throws FullServerPlayerException {
 		// assign a unique table id
 		synchronized (global) { // critical section
 			for (int i = 0; i < global.length; i++) {
@@ -25,7 +26,7 @@ public class Room {
 			}
 		}
 		if (id == -1) {
-			throw new FullServerException();
+			throw new FullServerPlayerException();
 		}
 
 	}
@@ -48,7 +49,7 @@ public class Room {
 					break join;
 				}
 			}
-			him.output(Packet.SPErrorPacket("Table is full."));
+			him.output(Packet.SPErrorPacket(Packet.ERROR_FULL_SEAT));
 			return;
 		}
 	}

@@ -7,6 +7,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
+import Exception.FullServerPlayerException;
+import Exception.FullServerRoomException;
 import packet.Packet;
 
 class Player extends Thread {
@@ -26,7 +28,8 @@ class Player extends Thread {
 		return account;
 	}
 
-	public Player(Socket s, DataInputStream in, DataOutputStream out) throws FullServerException {
+	@SuppressWarnings("finally")
+	public Player(Socket s, DataInputStream in, DataOutputStream out) throws FullServerPlayerException {
 		synchronized (global) { // find a unique player id
 			for (int i = 0; i < global.length; i++) {
 				if (global[i] == null) {
@@ -36,8 +39,18 @@ class Player extends Thread {
 				}
 			}
 		}
-		if (id == -1) // all slots full
-			throw new FullServerException();
+		if (id == -1) {
+			try {
+				out.write(Packet.SPErrorPacket(Packet.ERROR_FULL_PLAYER));
+			}
+			catch(Exception e) {
+				
+			}
+			finally {
+				throw new FullServerPlayerException();
+			}		
+		}
+			
 		sock = s;
 		this.in = in;
 		this.out = out;
@@ -185,7 +198,9 @@ class Player extends Thread {
 				this.room = new Room();
 				this.room.join(this);
 			} catch (Exception e) {
-
+				if(e instanceof FullServerRoomException) {
+					output(Packet.SPErrorPacket(Packet.ERROR_FULL_ROOM));
+				}
 			}
 		}
 

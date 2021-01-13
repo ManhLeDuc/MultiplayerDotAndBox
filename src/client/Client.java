@@ -177,7 +177,9 @@ public class Client implements Runnable {
 	}
 	
 	void hdErrorPacket() throws IOException {
-		in.readUTF();
+		byte errorCode = in.readByte();
+		printPacket(Packet.SPErrorPacket(errorCode));
+		controller.handleError(errorCode);
 	}
 	
 	void hdGameWin() throws IOException {

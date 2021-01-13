@@ -79,7 +79,6 @@ public class Account {
 			}
 			csvReader.close();
 			accounts = tempAccounts;
-			System.out.println(accounts.size());
 
 		} catch (Exception e) {
 			System.out.println(e);

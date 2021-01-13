@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import Exception.FullServerPlayerException;
+
 class Server {
 	public static void main(String args[]) {
 		ServerSocket main_sock = null;
@@ -15,7 +17,7 @@ class Server {
 			main_sock = new ServerSocket(5656); // default port
 			System.out.println("Running");
 		} catch (IOException e) {
-			System.out.println();
+			System.out.println(e);
 			System.exit(1);
 		}
 		while (true) {
@@ -25,7 +27,12 @@ class Server {
 				DataOutputStream o = new DataOutputStream(s.getOutputStream());
 				(new Player(s, i, o)).start(); // start thread
 			} catch (Exception e) {
-				System.out.println();
+				if(e instanceof FullServerPlayerException) {
+					System.out.println("Full Player...");
+				}
+				else {
+					System.out.println(e);
+				}
 			}
 		}
 		

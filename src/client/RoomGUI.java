@@ -292,4 +292,8 @@ public class RoomGUI extends JFrame {
 		JOptionPane.showMessageDialog(this, String.valueOf(mmr), "New MMR!!!", JOptionPane.INFORMATION_MESSAGE);
 	}
 	
+	public void errorMessage(String message) {
+		JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
 }
